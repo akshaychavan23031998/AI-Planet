@@ -13,14 +13,16 @@ import { employeeActor } from './identity.js';
 import { businessLevels } from './types.js';
 import type { Actor, WorkflowClaim, WorkflowContext } from './types.js';
 
-type StoredClaim = InferSchemaType<typeof Claim.schema> & {
+export type StoredClaim = InferSchemaType<typeof Claim.schema> & {
   _id: Types.ObjectId;
 };
-type StoredTravel = InferSchemaType<typeof TravelRequest.schema>;
-type StoredExpense = InferSchemaType<typeof Expense.schema> & {
+export type StoredTravel = InferSchemaType<typeof TravelRequest.schema> & {
   _id: Types.ObjectId;
 };
-type StoredEvidence = InferSchemaType<typeof Evidence.schema> & {
+export type StoredExpense = InferSchemaType<typeof Expense.schema> & {
+  _id: Types.ObjectId;
+};
+export type StoredEvidence = InferSchemaType<typeof Evidence.schema> & {
   _id: Types.ObjectId;
 };
 
@@ -105,6 +107,15 @@ export function assembleClaimPolicyInput(
     'CLAIM_STATE_CONFLICT',
     'Evidence belongs to another travel request.',
   );
+  const reviews = new Map(
+    (claim.expenseReviews ?? []).map((item) => [item.expense.toString(), item]),
+  );
+  requireWorkflow(
+    reviews.size === (claim.expenseReviews ?? []).length &&
+      [...reviews.keys()].every((id) => ids.includes(id)),
+    'CLAIM_STATE_CONFLICT',
+    'Claim review references are inconsistent.',
+  );
   const preTravelApprovals = travel.preTravelApprovals.map((item) => {
     const level = businessLevels.find((level) => level === item.role);
     requireWorkflow(
@@ -143,29 +154,43 @@ export function assembleClaimPolicyInput(
       })),
     expenses: [...expenses]
       .sort((a, b) => a._id.toString().localeCompare(b._id.toString()))
-      .map((item) => ({
-        key: item._id.toString(),
-        employeeKey: item.employee.toString(),
-        category: item.category,
-        componentType: item.componentType,
-        amountMinor: item.amountMinor,
-        currency: item.currency,
-        paidBy: item.paidBy,
-        expenseDate: item.expenseDate ?? null,
-        merchant: item.merchant,
-        sourceReviewState: item.sourceReviewState,
-        evidenceKeys: item.sourceEvidence.map((id) => id.toString()).sort(),
-        ...(item.occurredAt
-          ? { occurredAt: item.occurredAt.toISOString() }
-          : {}),
-        ...(item.details?.invoiceNumber
-          ? { billReference: item.details.invoiceNumber }
-          : {}),
-        ...(item.details?.covers ? { covers: item.details.covers } : {}),
-        ...(item.details?.attendeeOrganization
-          ? { attendeeOrganisation: item.details.attendeeOrganization }
-          : {}),
-      })),
+      .map((item) => {
+        const review = reviews.get(item._id.toString());
+        const resolution = review?.manualResolution;
+        return {
+          ...(review ? { included: review.included } : {}),
+          ...(resolution
+            ? {
+                hotelTaxResolution: {
+                  reimbursableMinor: resolution.reimbursableMinor,
+                  disallowedMinor: resolution.disallowedMinor,
+                  note: resolution.reason,
+                },
+              }
+            : {}),
+          key: item._id.toString(),
+          employeeKey: item.employee.toString(),
+          category: item.category,
+          componentType: item.componentType,
+          amountMinor: item.amountMinor,
+          currency: item.currency,
+          paidBy: item.paidBy,
+          expenseDate: item.expenseDate ?? null,
+          merchant: item.merchant,
+          sourceReviewState: item.sourceReviewState,
+          evidenceKeys: item.sourceEvidence.map((id) => id.toString()).sort(),
+          ...(item.occurredAt
+            ? { occurredAt: item.occurredAt.toISOString() }
+            : {}),
+          ...(item.details?.invoiceNumber
+            ? { billReference: item.details.invoiceNumber }
+            : {}),
+          ...(item.details?.covers ? { covers: item.details.covers } : {}),
+          ...(item.details?.attendeeOrganization
+            ? { attendeeOrganisation: item.details.attendeeOrganization }
+            : {}),
+        };
+      }),
   };
 }
 export function policyInputHash(input: PolicyInput): string {
@@ -194,9 +219,7 @@ async function loadHierarchy(claimant: Actor): Promise<Actor[]> {
   }
   return hierarchy;
 }
-export async function loadClaimPolicyContext(
-  claimId: string,
-): Promise<WorkflowContext> {
+export async function loadClaimData(claimId: string) {
   requireWorkflow(
     isValidObjectId(claimId),
     'CLAIM_NOT_FOUND',
@@ -217,18 +240,29 @@ export async function loadClaimPolicyContext(
     'CLAIM_STATE_CONFLICT',
     'Claim travel or employee reference is missing.',
   );
-  const claimant = employeeActor(employee);
+  return { claim, travel, expenses, evidence, employee };
+}
+export type ClaimData = Awaited<ReturnType<typeof loadClaimData>>;
+export async function evaluateClaimData(
+  data: ClaimData,
+): Promise<WorkflowContext> {
+  const claimant = employeeActor(data.employee);
   const policyInput = assembleClaimPolicyInput(
-    claim,
-    travel,
-    expenses,
-    evidence,
+    data.claim,
+    data.travel,
+    data.expenses,
+    data.evidence,
   );
   return {
-    claim: workflowClaim(claim),
+    claim: workflowClaim(data.claim),
     claimant,
     hierarchy: await loadHierarchy(claimant),
     policy: evaluateClaimPolicy(policyInput),
     policyInputHash: policyInputHash(policyInput),
   };
+}
+export async function loadClaimPolicyContext(
+  claimId: string,
+): Promise<WorkflowContext> {
+  return evaluateClaimData(await loadClaimData(claimId));
 }

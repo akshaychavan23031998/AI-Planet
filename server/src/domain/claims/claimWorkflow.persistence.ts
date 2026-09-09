@@ -2,10 +2,7 @@ import { Claim } from '../../modules/claims/claim.model.js';
 import { requireWorkflow } from './errors.js';
 import type { WorkflowClaim, WorkflowPlan } from './types.js';
 
-export function conditionalWorkflowWrite(
-  claim: WorkflowClaim,
-  plan: WorkflowPlan,
-) {
+export function workflowFilter(claim: WorkflowClaim) {
   // Pre-workflow seeded documents may lack these fields; missing is equivalent to their zero defaults.
   const cycleCondition =
     claim.reviewCycle === 0
@@ -26,12 +23,18 @@ export function conditionalWorkflowWrite(
     'Workflow version overflow.',
   );
   return {
-    filter: {
-      _id: claim.claimId,
-      employee: claim.employeeId,
-      status: claim.status,
-      $and: [cycleCondition, versionCondition],
-    },
+    _id: claim.claimId,
+    employee: claim.employeeId,
+    status: claim.status,
+    $and: [cycleCondition, versionCondition],
+  };
+}
+export function conditionalWorkflowWrite(
+  claim: WorkflowClaim,
+  plan: WorkflowPlan,
+) {
+  return {
+    filter: workflowFilter(claim),
     update: {
       $set: {
         status: plan.status,

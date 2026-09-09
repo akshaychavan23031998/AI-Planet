@@ -1,7 +1,9 @@
 import type { Server } from 'node:http';
-import { app, logger } from './app.js';
+import { createApp, logger } from './app.js';
 import { env } from './env.js';
 import { connectToDatabase, disconnectFromDatabase } from './database.js';
+
+const app = createApp(env);
 
 let server: Server | undefined;
 let shuttingDown = false;

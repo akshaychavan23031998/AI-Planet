@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import {
   currency,
   dateOnly,
+  moneyMinor,
   nonNegativeInteger,
   requiredText,
   seededFields,
@@ -62,6 +63,40 @@ const financeSchema = new Schema(
   },
   { _id: false, strict: 'throw' },
 );
+const manualResolutionSchema = new Schema(
+  {
+    reimbursableMinor: moneyMinor,
+    disallowedMinor: moneyMinor,
+    reason: requiredText,
+  },
+  { _id: false, strict: 'throw' },
+);
+const expenseReviewSchema = new Schema(
+  {
+    expense: { type: Schema.Types.ObjectId, ref: 'Expense', required: true },
+    included: { type: Boolean, required: true },
+    exclusionReason: String,
+    manualResolution: manualResolutionSchema,
+    updatedBy: employeeRef,
+    updatedAt: { type: Date, required: true },
+  },
+  { _id: false, strict: 'throw' },
+);
+const expenseReviewEventSchema = new Schema(
+  {
+    action: {
+      type: String,
+      enum: ['EXCLUDED', 'RESTORED', 'RESOLVED'],
+      required: true,
+    },
+    expense: { type: Schema.Types.ObjectId, ref: 'Expense', required: true },
+    actor: employeeRef,
+    occurredAt: { type: Date, required: true },
+    reason: String,
+    resolution: manualResolutionSchema,
+  },
+  { _id: false, strict: 'throw' },
+);
 const claimSchema = new Schema(
   {
     ...seededFields,
@@ -77,6 +112,8 @@ const claimSchema = new Schema(
     reviewCycle: { ...cycle, default: 0 },
     workflowVersion: { ...nonNegativeInteger, required: true, default: 0 },
     approvals: { type: [approvalSchema], default: [] },
+    expenseReviews: { type: [expenseReviewSchema], default: [] },
+    expenseReviewHistory: { type: [expenseReviewEventSchema], default: [] },
     workflowHistory: { type: [workflowEventSchema], default: [] },
     reviewRoute: { type: [routeSchema], default: [] },
     reviewInputHash: {

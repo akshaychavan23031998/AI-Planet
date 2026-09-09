@@ -13,9 +13,10 @@
     "format:check": "prettier --check .",
     "seed": "tsx --env-file-if-exists=.env src/seed/assignmentPack/seedDatabase.ts",
     "test:seed": "tsx --test src/seed/assignmentPack/assignmentPack.test.ts",
-    "test": "npm run test:policy && npm run test:workflow",
+    "test": "npm run test:policy && npm run test:workflow && npm run test:api",
     "test:policy": "tsx --test src/domain/policy/policy.test.ts",
-    "test:workflow": "tsx --test src/domain/claims/claimWorkflow.test.ts"
+    "test:workflow": "tsx --test src/domain/claims/claimWorkflow.test.ts",
+    "test:api": "tsx --test src/api/v1/api.test.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -31,6 +32,8 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/mailparser": "^3.4.6",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.2.2",
     "tsx": "^4.23.13"
   }
 }

@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler } from 'express';
+import { mapApiError } from './api/v1/errorMapping.js';
 
 export const errorHandler: ErrorRequestHandler = (
   error: unknown,
@@ -6,10 +7,12 @@ export const errorHandler: ErrorRequestHandler = (
   res,
   next,
 ) => {
-  req.log.error({ err: error }, 'Unexpected request error');
+  const mapped = mapApiError(error);
+  if (mapped.status === 500)
+    req.log.error({ code: 'INTERNAL_ERROR' }, 'Unexpected request error');
   if (res.headersSent) {
     next(error);
     return;
   }
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(mapped.status).json(mapped.body);
 };
