@@ -702,3 +702,42 @@ test('exact-origin CORS and authenticated API not-found handling remain consiste
   );
   error(await get('/unknown'), 404, 'NOT_FOUND');
 });
+
+test('production CORS advertises only the configured frontend origin', async () => {
+  const productionOrigin = 'https://ai-planet-frontend.vercel.app';
+  const unrelatedOrigin = 'http://localhost:5173';
+
+  const productionApp = createApp({
+    NODE_ENV: 'production',
+    CLIENT_ORIGIN: productionOrigin,
+  });
+
+  const allowed = await request(productionApp)
+    .options(`${base}/claims`)
+    .set('Origin', productionOrigin)
+    .set('Access-Control-Request-Method', 'GET')
+    .set('Access-Control-Request-Headers', 'X-Demo-Employee-Code')
+    .expect(204);
+
+  assert.equal(
+    allowed.headers['access-control-allow-origin'],
+    productionOrigin,
+  );
+
+  const unrelated = await request(productionApp)
+    .options(`${base}/claims`)
+    .set('Origin', unrelatedOrigin)
+    .set('Access-Control-Request-Method', 'GET')
+    .set('Access-Control-Request-Headers', 'X-Demo-Employee-Code')
+    .expect(204);
+
+  assert.equal(
+    unrelated.headers['access-control-allow-origin'],
+    productionOrigin,
+  );
+
+  assert.notEqual(
+    unrelated.headers['access-control-allow-origin'],
+    unrelatedOrigin,
+  );
+});

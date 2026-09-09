@@ -7,16 +7,18 @@ import { pinoHttp } from 'pino-http';
 import type { env } from './env.js';
 import { apiV1 } from './api/v1/router.js';
 import { errorHandler } from './errorHandler.js';
-import { isDatabaseReady } from './database.js';
+import { connectToDatabase, isDatabaseReady } from './database.js';
 
 export const logger = pino();
+
 export function createApp(
   config: Pick<typeof env, 'NODE_ENV' | 'CLIENT_ORIGIN'>,
 ) {
   const app = express();
 
   app.disable('x-powered-by');
-  // Keep request headers, query strings, and bodies out of routine access logs.
+
+  // Keep request headers, query strings and bodies out of routine access logs.
   app.use(
     pinoHttp({
       logger,
@@ -26,24 +28,75 @@ export function createApp(
           method: req.method,
           path: req.url?.split('?')[0],
         }),
-        res: (res) => ({ statusCode: res.statusCode }),
+        res: (res) => ({
+          statusCode: res.statusCode,
+        }),
       },
     }),
   );
-  if (config.NODE_ENV === 'development') {
-    app.use(cors({ origin: config.CLIENT_ORIGIN }));
-  }
+
+  /**
+   * The browser is allowed to call the API only from the configured frontend
+   * origin. This applies in both local development and production.
+   *
+   * CLIENT_ORIGIN:
+   *   local      -> http://localhost:5173
+   *   production -> https://<frontend-project>.vercel.app
+   *
+   * Do not replace this with wildcard CORS.
+   */
+  app.use(
+    cors({
+      origin: config.CLIENT_ORIGIN,
+    }),
+  );
+
+  /**
+   * Liveness intentionally does not depend on MongoDB.
+   *
+   * A running HTTP function can therefore still report itself alive while
+   * /ready reports that its database dependency is unavailable.
+   */
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
   });
-  app.get('/ready', (_req, res) => {
+
+  /**
+   * Local development connects to MongoDB before app.listen() in server.ts.
+   *
+   * Vercel, however, may start the exported Express app as a serverless /
+   * Fluid Compute instance without executing the local listener startup.
+   * In production, readiness therefore ensures that the reusable Mongoose
+   * connection has been initialized.
+   */
+  app.get('/ready', async (_req, res) => {
+    if (config.NODE_ENV === 'production' && !isDatabaseReady()) {
+      try {
+        await connectToDatabase();
+      } catch {
+        res.status(503).json({
+          status: 'not_ready',
+          database: 'disconnected',
+        });
+        return;
+      }
+    }
+
     const ready = isDatabaseReady();
+
     res.status(ready ? 200 : 503).json({
       status: ready ? 'ready' : 'not_ready',
       database: ready ? 'connected' : 'disconnected',
     });
   });
-  app.get('/openapi.json', (_req, res) => res.json(openapiDocument));
+
+  /**
+   * API documentation is intentionally independent of MongoDB.
+   */
+  app.get('/openapi.json', (_req, res) => {
+    res.json(openapiDocument);
+  });
+
   app.use(
     '/docs',
     swaggerUi.serve,
@@ -56,7 +109,33 @@ export function createApp(
       },
     }),
   );
+
+  /**
+   * On Vercel production instances, establish/reuse MongoDB before entering
+   * feature routes. connectToDatabase() already reuses active/in-flight
+   * connections, so this does not deliberately create one connection per
+   * request.
+   *
+   * Development continues using server.ts startup connection behavior.
+   * Tests remain offline and keep their existing mocked persistence boundary.
+   */
+  app.use('/api/v1', async (_req, _res, next) => {
+    if (config.NODE_ENV !== 'production' || isDatabaseReady()) {
+      next();
+      return;
+    }
+
+    try {
+      await connectToDatabase();
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.use('/api/v1', express.json({ limit: '64kb' }), apiV1);
+
   app.use(errorHandler);
+
   return app;
 }
