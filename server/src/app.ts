@@ -4,6 +4,7 @@ import pino from 'pino';
 import { pinoHttp } from 'pino-http';
 import { env } from './env.js';
 import { errorHandler } from './errorHandler.js';
+import { isDatabaseReady } from './database.js';
 
 export const logger = pino();
 export const app = express();
@@ -28,5 +29,12 @@ if (env.NODE_ENV === 'development') {
 }
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
+});
+app.get('/ready', (_req, res) => {
+  const ready = isDatabaseReady();
+  res.status(ready ? 200 : 503).json({
+    status: ready ? 'ready' : 'not_ready',
+    database: ready ? 'connected' : 'disconnected',
+  });
 });
 app.use(errorHandler);

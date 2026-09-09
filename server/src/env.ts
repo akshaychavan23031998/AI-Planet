@@ -1,6 +1,15 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
+  MONGODB_URI: z
+    .string()
+    .trim()
+    .regex(/^mongodb(?:\+srv)?:\/\/\S+$/, 'Must be a MongoDB connection URI'),
+  MONGODB_DB_NAME: z
+    .string()
+    .trim()
+    .min(1)
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Must be a database name'),
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
     .default('development'),
