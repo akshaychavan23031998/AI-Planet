@@ -1,6 +1,6 @@
 # AI Planet bootstrap
 
-Tasks 1–7: a minimal React/Vite/TypeScript client and Express/TypeScript server, managed with npm workspaces, with a reusable Mongoose connection to MongoDB Atlas. Five domain models and a deterministic assignment-pack seed are available. A pure backend policy evaluator and claim workflow services are available. Versioned REST APIs expose these services under `/api/v1`.
+Tasks 1–8: a minimal React/Vite/TypeScript client and Express/TypeScript server, managed with npm workspaces, with a reusable Mongoose connection to MongoDB Atlas. Five domain models and a deterministic assignment-pack seed are available. A pure backend policy evaluator and claim workflow services are available. Versioned REST APIs expose these services under `/api/v1`.
 
 Use Node.js 22.20+ and npm. MongoDB Atlas is required for server startup. If you do not already have `server/.env`, copy `server/.env.example` to it. Provide your real `MONGODB_URI` and set `MONGODB_DB_NAME` to `ai_planet_expense`. Keep the database name separate from the URI. Never commit `server/.env`.
 
@@ -77,7 +77,7 @@ The canonical initial evaluation is intentionally provisional. Dinner and mixed 
 
 `server/src/domain/claims/` provides employee-code identity resolution, hierarchy authorization, pure transition planning, persisted policy-input assembly and conditional Mongo updates. `resolveDemoActor(employeeCode)` loads Employee data; public workflow services reload the actor and ignore caller-supplied roles or hierarchy. This is deliberate demo impersonation, not real authentication. The HTTP boundary resolves the demo identity before protected routes.
 
-Services: `submitClaim`, `approveClaim`, `returnClaim`, `resubmitClaim`, `verifyClaimByFinance`, `schedulePayment` and `markClaimPaid`. Run `npm run test:workflow` for offline workflow/service tests. Root `npm test` runs policy, workflow and API tests; source-dependent `test:seed` stays separate. Tests mock Mongo query boundaries and never change Atlas.
+Services: `submitClaim`, `approveClaim`, `returnClaim`, `resubmitClaim`, `verifyClaimByFinance`, `schedulePayment` and `markClaimPaid`. Run `npm run test:workflow` for offline workflow/service tests. Root `npm test` runs policy, workflow, API and OpenAPI tests; source-dependent `test:seed` stays separate. Tests mock Mongo query boundaries and never change Atlas.
 
 Persistent states are `DRAFT`, `MANAGER_REVIEW`, `HOD_REVIEW`, `DIVISION_REVIEW`, `MD_REVIEW`, `FINANCE_REVIEW`, `RETURNED`, `PAYMENT_SCHEDULED` and `PAID`. Submission is an audit event and enters the first required review immediately. Only the claimant submits/resubmits; the exact resolved ancestor approves/returns; Finance actions require a persisted Finance role. No claimant may review their own claim, including Finance review. A claimant occupying a business approval level skips that level and lower levels, escalating to the next higher resolved ancestor; missing/cyclic hierarchy or no higher approver fails safely.
 
@@ -96,3 +96,11 @@ Claimants read their own records. Business approvers see their exact current ass
 Only the claimant can exclude, restore or resolve an expense in a DRAFT or RETURNED claim. Reviews and append-only review history live on Claim and share its conditional revision guard. Restore retains any explicit tax allocation; resolving an excluded expense does not silently include it. Manual allocation is limited to mixed hotel tax and validated by the existing policy function. Original Expense and Evidence records stay unchanged. The unreviewed canonical scenario remains blocked; no hypothetical review decision is seeded.
 
 `npm run test:api` runs Supertest against the real Express middleware, routes and services with isolated Mongo query mocks. Supertest and its TypeScript definitions are development dependencies only. These tests, `npm run test:policy`, `npm run test:workflow` and root `npm test` require neither Atlas nor the source pack and do not write to Atlas. The app factory is importable without environment credentials; normal server startup still validates configuration and connects before listening.
+
+## OpenAPI and Swagger UI
+
+`GET /openapi.json` serves the static OpenAPI 3.0.3 contract. `GET /docs` opens Swagger UI for every `/api/v1` route plus `/health` and `/ready`. Both documentation endpoints are public. In Swagger **Authorize**, enter a demo employee code such as `NX-4471`; protected operations send it as `X-Demo-Employee-Code`. This is demo identity, not real authentication. Swagger retains the entry locally for convenience.
+
+The contract is maintained in `server/src/openapi/` and does not query MongoDB or read the assignment pack. Swagger loads the same `/openapi.json` document. Normal server startup still requires the existing Atlas configuration. Examples of tax allocations, future scheduling and payment references are explicitly hypothetical; the canonical initial settlement remains provisional.
+
+Run `npm run test:openapi` for offline specification/reference validation, route and schema coverage, canonical example checks and Swagger HTTP tests. Root `npm test` includes this suite. `swagger-ui-express` serves the UI; its TypeScript definitions, `openapi-types` and `@apidevtools/swagger-parser` are development-only typing and contract-validation tools.

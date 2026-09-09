@@ -24,7 +24,8 @@
     "test": "npm run test --workspace server",
     "test:policy": "npm run test:policy --workspace server",
     "test:workflow": "npm run test:workflow --workspace server",
-    "test:api": "npm run test:api --workspace server"
+    "test:api": "npm run test:api --workspace server",
+    "test:openapi": "npm run test:openapi --workspace server"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

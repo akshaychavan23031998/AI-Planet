@@ -1,4 +1,6 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import { openapiDocument } from './openapi/document.js';
 import cors from 'cors';
 import pino from 'pino';
 import { pinoHttp } from 'pino-http';
@@ -41,6 +43,19 @@ export function createApp(
       database: ready ? 'connected' : 'disconnected',
     });
   });
+  app.get('/openapi.json', (_req, res) => res.json(openapiDocument));
+  app.use(
+    '/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(undefined, {
+      customSiteTitle: 'AI Planet Expense Reimbursement API',
+      swaggerOptions: {
+        url: '/openapi.json',
+        persistAuthorization: true,
+        validatorUrl: null,
+      },
+    }),
+  );
   app.use('/api/v1', express.json({ limit: '64kb' }), apiV1);
   app.use(errorHandler);
   return app;
