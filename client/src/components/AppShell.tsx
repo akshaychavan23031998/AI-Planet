@@ -1,5 +1,6 @@
+import { useTrips, useClaims } from '../app/queries';
 import { useEffect, useRef, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useMatch } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
@@ -11,6 +12,19 @@ export function AppShell() {
   const main = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const trips = useTrips();
+  const claims = useClaims();
+  const routeTripId = useMatch('/trips/:travelRequestId/*')?.params
+    .travelRequestId;
+  const routeClaimId = useMatch('/claims/:claimId')?.params.claimId;
+  const visibleClaims = claims.isError ? [] : (claims.data ?? []);
+  const recentTripId =
+    routeTripId ??
+    visibleClaims.find((claim) => claim.id === routeClaimId)?.travelRequest ??
+    (trips.isError ? undefined : trips.data?.[0]?.id);
+  const relatedClaimId = visibleClaims.find(
+    (claim) => claim.travelRequest === recentTripId,
+  )?.id;
   const {
     isLoadingUsers,
     usersError,
@@ -30,7 +44,7 @@ export function AppShell() {
         Skip to content
       </a>
       <aside className={styles.desktopSidebar}>
-        <Sidebar />
+        <Sidebar recentTripId={recentTripId} relatedClaimId={relatedClaimId} />
       </aside>
       <dialog
         id="mobile-navigation"
@@ -46,7 +60,11 @@ export function AppShell() {
         >
           <X size={20} aria-hidden="true" />
         </button>
-        <Sidebar onNavigate={closeMenu} />
+        <Sidebar
+          onNavigate={closeMenu}
+          recentTripId={recentTripId}
+          relatedClaimId={relatedClaimId}
+        />
       </dialog>
       <div className={styles.mainWrap}>
         <Header

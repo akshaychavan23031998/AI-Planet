@@ -9,13 +9,21 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import styles from './shell.module.css';
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export function Sidebar({
+  onNavigate,
+  recentTripId,
+  relatedClaimId,
+}: {
+  onNavigate?: () => void;
+  recentTripId?: string | undefined;
+  relatedClaimId?: string | undefined;
+}) {
   const tripId = useMatch('/trips/:travelRequestId/*')?.params.travelRequestId;
   const claimId = useMatch('/claims/:claimId')?.params.claimId;
   const validId = (id: string | undefined) =>
     id && /^[a-fA-F0-9]{24}$/.test(id) ? id : null;
-  const trip = validId(tripId);
-  const claim = validId(claimId);
+  const trip = validId(tripId ?? recentTripId);
+  const claim = validId(claimId ?? relatedClaimId);
   function item(label: string, Icon: LucideIcon, to?: string) {
     const content = (
       <>

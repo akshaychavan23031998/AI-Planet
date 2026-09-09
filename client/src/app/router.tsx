@@ -1,9 +1,9 @@
+import { DashboardPage } from '../pages/DashboardPage';
+import { TripPage } from '../pages/TripPage';
+import { EvidencePage } from '../pages/EvidencePage';
 import { Route, Routes } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import {
-  DashboardPage,
-  TripPage,
-  EvidencePage,
   ClaimPage,
   ApprovalsPage,
   FinancePage,

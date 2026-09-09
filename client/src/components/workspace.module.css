@@ -1,0 +1,356 @@
+.stack {
+  display: grid;
+  gap: 16px;
+}
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+  gap: 16px;
+}
+.summary {
+  min-height: 94px;
+}
+.eyebrow {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.value {
+  margin-top: 12px;
+  font-size: 23px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: start;
+}
+.route {
+  font-size: 23px;
+  margin: 14px 0 8px;
+}
+.hero p {
+  font-size: 13px;
+  line-height: 1.65;
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 20px 0;
+}
+.facts dt {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.facts dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.actions a,
+.hero > a {
+  font-weight: 600;
+}
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 16px;
+}
+.sectionTitle {
+  font-size: 16px;
+  margin: 6px 0 0;
+}
+.sectionHeading h2,
+.columns h2,
+.stack section > h2 {
+  font-size: 16px;
+}
+.sectionHeading p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.notes {
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.notes li + li {
+  margin-top: 12px;
+}
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.evidenceRow,
+.expenseRow {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.evidenceRow {
+  grid-template-columns:
+    36px minmax(0, 1fr) minmax(120px, 0.48fr) minmax(100px, 0.35fr)
+    auto;
+}
+.expenseRow {
+  grid-template-columns: minmax(0, 1.7fr) minmax(150px, 0.65fr) minmax(0, 1fr);
+  align-items: start;
+}
+.evidenceRow p,
+.expenseRow p {
+  margin: 6px 0;
+}
+.evidenceRow strong {
+  font-size: 13px;
+}
+.sourceIcon {
+  width: 36px;
+  height: 36px;
+  background: var(--surface-subtle);
+  color: var(--blue);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+.amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.amount small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.toolbar label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.toolbar label:first-child {
+  flex: 1;
+  min-width: min(220px, 100%);
+}
+.toolbar input,
+.toolbar select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+}
+.toolbar button,
+.evidenceRow > button,
+.drawerHeader button {
+  padding: 9px 12px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+.proof {
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 5px 0;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.callout {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(620px, 100%);
+  height: 100dvh;
+  max-height: 100dvh;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--border);
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+.drawer::backdrop {
+  background: rgb(18 43 73 / 35%);
+}
+.drawerHeader {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+.drawerHeader h2 {
+  font-size: 17px;
+  margin: 0;
+}
+.drawerHeader button {
+  display: grid;
+  place-items: center;
+}
+.drawerBody {
+  padding: 20px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.drawerBody h3 {
+  font-size: 15px;
+}
+.drawerBody section {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 20px;
+}
+.bodyText {
+  white-space: pre-wrap;
+}
+.attachment {
+  background: var(--surface-subtle);
+  padding: 16px;
+  border-radius: 8px;
+}
+.linkedExpense {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+@media (max-width: 1100px) {
+  .evidenceRow {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+  }
+  .evidenceRow > div:nth-child(3) {
+    grid-column: 2;
+  }
+  .evidenceRow > button {
+    grid-column: 3;
+  }
+  .amount {
+    grid-row: 1;
+    grid-column: 3;
+  }
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .evidenceRow {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+  .evidenceRow > div:nth-child(3),
+  .evidenceRow > button,
+  .amount {
+    grid-column: 2;
+    grid-row: auto;
+    text-align: left;
+  }
+  .evidenceRow > button {
+    justify-self: start;
+  }
+  .expenseRow {
+    grid-template-columns: 1fr;
+  }
+  .toolbar label {
+    flex: 1;
+    min-width: 100%;
+  }
+  .facts {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .drawerBody {
+    padding: 16px;
+  }
+  .route {
+    font-size: 21px;
+  }
+}
+.stack > section,
+.columns > section {
+  padding: 18px;
+  min-width: 0;
+}
+.summary {
+  padding: 16px;
+}
+@media (max-width: 640px) {
+  .stack > section,
+  .columns > section {
+    padding: 14px;
+  }
+}

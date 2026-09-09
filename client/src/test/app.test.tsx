@@ -27,13 +27,23 @@ const people = [
 function respond(users = people) {
   vi.stubGlobal(
     'fetch',
-    vi
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve(
-          Response.json({ data: users, meta: { count: users.length } }),
-        ),
+    vi.fn().mockImplementation((url: string) =>
+      Promise.resolve(
+        url.endsWith('/demo/users')
+          ? Response.json({ data: users, meta: { count: users.length } })
+          : /travel-requests\/[a-f0-9]{24}$/.test(url)
+            ? Response.json(
+                {
+                  error: {
+                    code: 'NOT_FOUND',
+                    message: 'Travel request not found',
+                  },
+                },
+                { status: 404 },
+              )
+            : Response.json({ data: [], meta: { count: 0 } }),
       ),
+    ),
   );
 }
 function Probe() {

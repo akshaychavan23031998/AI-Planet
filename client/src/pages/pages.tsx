@@ -20,42 +20,6 @@ function WorkspacePage({
     </>
   );
 }
-export function DashboardPage() {
-  return (
-    <WorkspacePage
-      title="Dashboard"
-      description="Your travel and expense workspace."
-      emptyTitle="Your workspace is ready"
-      emptyMessage="Your trips and expense activity will appear here."
-    />
-  );
-}
-export function TripPage() {
-  const { travelRequestId } = useParams();
-  if (!travelRequestId || !/^[a-fA-F0-9]{24}$/.test(travelRequestId))
-    return <NotFoundPage />;
-  return (
-    <WorkspacePage
-      title="Trip"
-      description="Travel request overview."
-      emptyTitle="Trip workspace"
-      emptyMessage="Travel information and supporting records will appear here."
-    />
-  );
-}
-export function EvidencePage() {
-  const { travelRequestId } = useParams();
-  if (!travelRequestId || !/^[a-fA-F0-9]{24}$/.test(travelRequestId))
-    return <NotFoundPage />;
-  return (
-    <WorkspacePage
-      title="Evidence"
-      description="Supporting records for your trip."
-      emptyTitle="Evidence inbox"
-      emptyMessage="Emails and receipt references will appear here."
-    />
-  );
-}
 export function ClaimPage() {
   const { claimId } = useParams();
   if (!claimId || !/^[a-fA-F0-9]{24}$/.test(claimId)) return <NotFoundPage />;
