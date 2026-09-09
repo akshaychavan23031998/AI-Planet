@@ -64,10 +64,9 @@ export function createApp(
   /**
    * Local development connects to MongoDB before app.listen() in server.ts.
    *
-   * Vercel, however, may start the exported Express app as a serverless /
-   * Fluid Compute instance without executing the local listener startup.
-   * In production, readiness therefore ensures that the reusable Mongoose
-   * connection has been initialized.
+   * Vercel may load this exported Express application directly instead of
+   * running the local HTTP-listener startup path. In production, readiness
+   * therefore ensures that the reusable MongoDB connection is initialized.
    */
   app.get('/ready', async (_req, res) => {
     if (config.NODE_ENV === 'production' && !isDatabaseReady()) {
@@ -111,12 +110,13 @@ export function createApp(
   );
 
   /**
-   * On Vercel production instances, establish/reuse MongoDB before entering
-   * feature routes. connectToDatabase() already reuses active/in-flight
-   * connections, so this does not deliberately create one connection per
-   * request.
+   * On production Vercel instances, establish/reuse MongoDB before entering
+   * database-backed feature routes.
    *
-   * Development continues using server.ts startup connection behavior.
+   * connectToDatabase() reuses active and in-flight Mongoose connections,
+   * therefore this does not deliberately create a new connection per request.
+   *
+   * Local development continues using server.ts startup connection behavior.
    * Tests remain offline and keep their existing mocked persistence boundary.
    */
   app.use('/api/v1', async (_req, _res, next) => {
@@ -139,3 +139,34 @@ export function createApp(
 
   return app;
 }
+
+/**
+ * Vercel recognizes src/app.ts as an Express entrypoint and requires the
+ * application instance to be available as the module's default export.
+ *
+ * We intentionally avoid importing the runtime env object here because that
+ * module validates MongoDB configuration eagerly. Keeping this default export
+ * lightweight preserves the distinction between:
+ *
+ *   /health -> HTTP application liveness
+ *   /ready  -> MongoDB readiness
+ *
+ * Local development still uses server.ts, where the complete environment is
+ * validated before the server begins listening.
+ */
+const runtimeNodeEnv: 'development' | 'test' | 'production' =
+  process.env.NODE_ENV === 'production'
+    ? 'production'
+    : process.env.NODE_ENV === 'test'
+      ? 'test'
+      : 'development';
+
+const runtimeClientOrigin =
+  process.env.CLIENT_ORIGIN?.trim() || 'http://localhost:5173';
+
+const app = createApp({
+  NODE_ENV: runtimeNodeEnv,
+  CLIENT_ORIGIN: runtimeClientOrigin,
+});
+
+export default app;
