@@ -1,3 +1,4 @@
+import type { ClaimStatus } from './claimTypes';
 import type { DemoEmployee } from './demo';
 export interface TravelRequest {
   id: string;
@@ -113,15 +114,5 @@ export interface Expense {
 export interface ClaimSummary {
   id: string;
   travelRequest: string;
-  status:
-    | 'DRAFT'
-    | 'SUBMITTED'
-    | 'MANAGER_REVIEW'
-    | 'HOD_REVIEW'
-    | 'DIVISION_REVIEW'
-    | 'MD_REVIEW'
-    | 'FINANCE_REVIEW'
-    | 'RETURNED'
-    | 'PAYMENT_SCHEDULED'
-    | 'PAID';
+  status: ClaimStatus;
 }

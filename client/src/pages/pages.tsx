@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, EmptyState, PageHeader } from '../components/ui';
 function WorkspacePage({
   title,
@@ -18,18 +18,6 @@ function WorkspacePage({
         <EmptyState title={emptyTitle}>{emptyMessage}</EmptyState>
       </Card>
     </>
-  );
-}
-export function ClaimPage() {
-  const { claimId } = useParams();
-  if (!claimId || !/^[a-fA-F0-9]{24}$/.test(claimId)) return <NotFoundPage />;
-  return (
-    <WorkspacePage
-      title="Expense Claim"
-      description="Expense review and settlement workspace."
-      emptyTitle="Claim workspace"
-      emptyMessage="Expense details and review information will appear here."
-    />
   );
 }
 export function ApprovalsPage() {

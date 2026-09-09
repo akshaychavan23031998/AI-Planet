@@ -107,7 +107,7 @@ Run `npm run test:openapi` for offline specification/reference validation, route
 
 ## React foundation
 
-The client now provides the approved Nortex shell, React Router, TanStack Query, a native-fetch API client, a small demo identity Context, Lucide icons and one Sonner toast root. CSS Modules use shared tokens based on the external approved prototype. The Dashboard now loads actor-visible trips, estimates, advances, evidence counts and claim-status links from the backend. Trip and Evidence pages expose source facts; Claim, Approvals and Finance pages remain structural placeholders.
+The client now provides the approved Nortex shell, React Router, TanStack Query, a native-fetch API client, a small demo identity Context, Lucide icons and one Sonner toast root. CSS Modules use shared tokens based on the external approved prototype. The Dashboard now loads actor-visible trips, estimates, advances, evidence counts and claim-status links from the backend. Trip and Evidence pages expose source facts; Claim review now supports employee decisions and submission; Approvals and Finance pages remain structural placeholders.
 
 Routes: `/`, `/trips/:travelRequestId`, `/trips/:travelRequestId/evidence`, `/claims/:claimId`, `/approvals`, `/finance` and a not-found fallback. Route identifiers are Mongo document IDs, not business Travel Request IDs. Trip/evidence/claim sidebar entries use the current route or recent API records; no seed ID is invented. Approval and Finance navigation is visible for demo exploration; backend authorization remains authoritative.
 
@@ -123,4 +123,14 @@ Run `npm run test:client` for offline Vitest/Testing Library checks. Root `npm t
 
 The Dashboard links to `/trips/:travelRequestId` and `/trips/:travelRequestId/evidence` using real backend records. Trip detail preserves unknown business IDs, recorded historical approvals and reconciliation notes. Source-normalized expenses retain both employee-paid and company-paid costs; displayed gross totals are not reimbursement calculations.
 
-Evidence includes every returned classification, including duplicates, failed payments, claimant mismatch and noise. Local classification/kind filters and search operate on the loaded list. An accessible detail drawer fetches actor-scoped evidence, shows email text and receipt metadata, follows relationships and traces linked expenses. Receipt references are metadata-only because the backend does not serve image binaries; no local filesystem paths are fetched by the browser. There is no Claim policy editing or workflow action UI in this phase.
+Evidence includes every returned classification, including duplicates, failed payments, claimant mismatch and noise. Local classification/kind filters and search operate on the loaded list. An accessible detail drawer fetches actor-scoped evidence, shows email text and receipt metadata, follows relationships and traces linked expenses. Receipt references are metadata-only because the backend does not serve image binaries; no local filesystem paths are fetched by the browser. The Claim workspace links these sources to backend policy evaluation and Claim-specific review decisions.
+
+## Employee Claim review
+
+`/claims/:claimId` displays source expenses, policy findings, settlement, submission readiness and persisted workflow history by review cycle. Policy results, approval routes and financial amounts remain backend authoritative; unknown payable/recoverable values stay pending rather than becoming zero.
+
+Only the claimant can edit `DRAFT` and `RETURNED` claims. Exclude requires a reason; restore preserves audit history; mixed hotel tax resolution requires an explicit allocation and reason, with no assumed canonical split. React Hook Form, Zod and the Zod resolver validate form input, including exact decimal-to-paise conversion. These decisions never modify source Expense or Evidence records.
+
+Submit and resubmit call the existing workflow endpoints without supplying a next status, approver or review cycle. `SUBMITTED` is a history event, not a persistent Claim status. Mutations do not retry or optimistically change financial values; affected actor-scoped Claim queries refetch before updated figures are shown. Conflicts and policy-not-ready responses refresh the current review state. Approval and Finance action UIs are not implemented yet.
+
+Frontend mutation tests use mocked HTTP responses. Do not use canonical Atlas claims for mutation smoke tests.

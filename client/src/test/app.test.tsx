@@ -31,7 +31,7 @@ function respond(users = people) {
       Promise.resolve(
         url.endsWith('/demo/users')
           ? Response.json({ data: users, meta: { count: users.length } })
-          : /travel-requests\/[a-f0-9]{24}$/.test(url)
+          : /(?:travel-requests|claims)\/[a-f0-9]{24}$/.test(url)
             ? Response.json(
                 {
                   error: {
