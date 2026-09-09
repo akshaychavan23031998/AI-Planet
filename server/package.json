@@ -10,11 +10,15 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seed": "tsx --env-file-if-exists=.env src/seed/assignmentPack/seedDatabase.ts",
+    "test:seed": "tsx --test src/seed/assignmentPack/assignmentPack.test.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",
+    "csv-parse": "^7.0.2",
     "express": "^5.2.1",
+    "mailparser": "^3.9.23",
     "mongoose": "^9.9.5",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
@@ -23,6 +27,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/mailparser": "^3.4.6",
     "tsx": "^4.23.13"
   }
 }

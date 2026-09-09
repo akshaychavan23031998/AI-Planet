@@ -18,7 +18,9 @@
     "typecheck": "npm run typecheck --workspaces",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seed": "npm run seed --workspace server",
+    "test:seed": "npm run test:seed --workspace server"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
