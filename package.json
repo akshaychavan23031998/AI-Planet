@@ -20,7 +20,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "seed": "npm run seed --workspace server",
-    "test:seed": "npm run test:seed --workspace server"
+    "test:seed": "npm run test:seed --workspace server",
+    "test": "npm run test:policy",
+    "test:policy": "npm run test:policy --workspace server"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

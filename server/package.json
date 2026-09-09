@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "seed": "tsx --env-file-if-exists=.env src/seed/assignmentPack/seedDatabase.ts",
-    "test:seed": "tsx --test src/seed/assignmentPack/assignmentPack.test.ts"
+    "test:seed": "tsx --test src/seed/assignmentPack/assignmentPack.test.ts",
+    "test": "npm run test:policy",
+    "test:policy": "tsx --test src/domain/policy/policy.test.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",
