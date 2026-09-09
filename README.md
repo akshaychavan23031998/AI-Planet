@@ -1,6 +1,6 @@
 # AI Planet bootstrap
 
-Tasks 1–5: a minimal React/Vite/TypeScript client and Express/TypeScript server, managed with npm workspaces, with a reusable Mongoose connection to MongoDB Atlas. Five domain models and a deterministic assignment-pack seed are available. A pure backend policy and settlement evaluator is available; workflow behavior is not implemented.
+Tasks 1–6: a minimal React/Vite/TypeScript client and Express/TypeScript server, managed with npm workspaces, with a reusable Mongoose connection to MongoDB Atlas. Five domain models and a deterministic assignment-pack seed are available. A pure backend policy evaluator and claim workflow services are available. Feature HTTP APIs are not exposed.
 
 Use Node.js 22.20+ and npm. MongoDB Atlas is required for server startup. If you do not already have `server/.env`, copy `server/.env.example` to it. Provide your real `MONGODB_URI` and set `MONGODB_DB_NAME` to `ai_planet_expense`. Keep the database name separate from the URI. Never commit `server/.env`.
 
@@ -61,7 +61,7 @@ Money uses integer paise. Business dates stay YYYY-MM-DD strings; known timestam
 
 Run `npm run test:policy` or `npm test` from the root. These use the existing Node test runner and tsx, require neither MongoDB nor the assignment-pack path, and reuse Task 4's plain canonical fixture constants in tests. `npm run test:seed` remains a separate source-backed check. No dependencies were added.
 
-Money remains safe integer paise. Eligible, disallowed, unresolved and explicitly excluded amounts remain separate; company-paid costs contribute only to the audit total. Unresolved included amounts or blockers make settlement provisional (`payableMinor` and `recoverableMinor` are `null`). An exact calculation is not payment authorization: business approvals and Finance verification still belong to the later workflow.
+Money remains safe integer paise. Eligible, disallowed, unresolved and explicitly excluded amounts remain separate; company-paid costs contribute only to the audit total. Unresolved included amounts or blockers make settlement provisional (`payableMinor` and `recoverableMinor` are `null`). An exact calculation is not payment authorization: business approvals and Finance verification are separate workflow steps.
 
 Implementation conventions:
 
@@ -72,3 +72,17 @@ Implementation conventions:
 - Approval timestamps must predate the relevant event. When only a business date is known, a same-day approval cannot prove it preceded that event; comparison conservatively uses the start of that date in India. The advance cap rounds down to whole paise so it cannot exceed 60%.
 
 The canonical initial evaluation is intentionally provisional. Dinner and mixed hotel tax remain unresolved; the future-review test supplies a hypothetical tax allocation and dinner exclusion only in memory. The canonical document, seeded source facts and database are unchanged.
+
+## Claim workflow and demo identity
+
+`server/src/domain/claims/` provides employee-code identity resolution, hierarchy authorization, pure transition planning, persisted policy-input assembly and conditional Mongo updates. `resolveDemoActor(employeeCode)` loads Employee data; public workflow services reload the actor and ignore caller-supplied roles or hierarchy. This is deliberate demo impersonation, not real authentication. No identity HTTP middleware or workflow REST endpoints exist.
+
+Services: `submitClaim`, `approveClaim`, `returnClaim`, `resubmitClaim`, `verifyClaimByFinance`, `schedulePayment` and `markClaimPaid`. Run `npm run test:workflow` for offline workflow/service tests. Root `npm test` runs both policy and workflow tests; source-dependent `test:seed` stays separate. Tests mock Mongo query boundaries and never change Atlas.
+
+Persistent states are `DRAFT`, `MANAGER_REVIEW`, `HOD_REVIEW`, `DIVISION_REVIEW`, `MD_REVIEW`, `FINANCE_REVIEW`, `RETURNED`, `PAYMENT_SCHEDULED` and `PAID`. Submission is an audit event and enters the first required review immediately. Only the claimant submits/resubmits; the exact resolved ancestor approves/returns; Finance actions require a persisted Finance role. No claimant may review their own claim, including Finance review. A claimant occupying a business approval level skips that level and lower levels, escalating to the next higher resolved ancestor; missing/cyclic hierarchy or no higher approver fails safely.
+
+Every resubmission restarts the full recalculated route in a new review cycle. This is the approved workflow design decision, not a claimed source-policy fact. Prior approvals/events remain for audit and cannot satisfy a new cycle. Active Finance metadata is cleared on resubmission. The canonical unresolved Claim still fails submission with `POLICY_NOT_READY`; no readiness rules were weakened or historical approvals invented. Manual expense exclusions/tax resolutions remain hypothetical inputs in tests; this phase adds no editing or resolution-persistence service.
+
+Each write atomically matches Claim ID, claimant, expected status, review cycle and `workflowVersion`; it increments the version and appends decisions/history in the same update. A lost match returns `CLAIM_STATE_CONFLICT`. The version also protects Finance verification, which keeps `FINANCE_REVIEW`. Old draft documents lacking cycle/version read as zero without migration. Fresh seed defaults explicitly clear Finance metadata and the review fingerprint to null, so seed field updates cannot leave stale payment metadata. Submission records the resolved route and a SHA-256 fingerprint of the plain policy input; subsequent approvals/Finance actions reject changed inputs or routes, while a return can request correction. Policy results/settlement totals are not stored. Conditional updates protect the Claim document, not a transaction across related collections; future financial edits must coordinate with the Claim revision and active-review restrictions.
+
+Finance verification does not mark paid. Payable settlements can be scheduled on a non-past 10th or 25th, using India business dates; marking paid requires an arrived schedule and a nonblank reference. Recoverable and zero settlements stay verified in `FINANCE_REVIEW`, with their derived direction exposed and reimbursement scheduling prohibited. No fake payment, extra terminal state, banking or payroll execution is introduced.
