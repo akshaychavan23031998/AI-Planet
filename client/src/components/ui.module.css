@@ -1,0 +1,100 @@
+.pageHeader {
+  margin-bottom: 22px;
+}
+.pageHeader h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  font-weight: 760;
+}
+.pageHeader p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 850px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow-wrap: anywhere;
+}
+.state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  padding: 36px 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+.state h2 {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 730;
+  margin: 0;
+}
+.state p {
+  max-width: 440px;
+  margin: 0;
+}
+.error {
+  color: var(--red);
+}
+.button {
+  padding: 8px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 12px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 720;
+  white-space: nowrap;
+}
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.neutral {
+  color: var(--muted);
+  background: var(--surface-strong);
+}
+.info {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+.success {
+  color: var(--green);
+  background: var(--green-soft);
+}
+.warning {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+.danger {
+  color: var(--red);
+  background: var(--red-soft);
+}
+.spinner {
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,6 +1,6 @@
 # AI Planet bootstrap
 
-Tasks 1–8: a minimal React/Vite/TypeScript client and Express/TypeScript server, managed with npm workspaces, with a reusable Mongoose connection to MongoDB Atlas. Five domain models and a deterministic assignment-pack seed are available. A pure backend policy evaluator and claim workflow services are available. Versioned REST APIs expose these services under `/api/v1`.
+Tasks 1–9: a minimal React/Vite/TypeScript client and Express/TypeScript server, managed with npm workspaces, with a reusable Mongoose connection to MongoDB Atlas. Five domain models and a deterministic assignment-pack seed are available. A pure backend policy evaluator and claim workflow services are available. Versioned REST APIs expose these services under `/api/v1`.
 
 Use Node.js 22.20+ and npm. MongoDB Atlas is required for server startup. If you do not already have `server/.env`, copy `server/.env.example` to it. Provide your real `MONGODB_URI` and set `MONGODB_DB_NAME` to `ai_planet_expense`. Keep the database name separate from the URI. Never commit `server/.env`.
 
@@ -77,7 +77,7 @@ The canonical initial evaluation is intentionally provisional. Dinner and mixed 
 
 `server/src/domain/claims/` provides employee-code identity resolution, hierarchy authorization, pure transition planning, persisted policy-input assembly and conditional Mongo updates. `resolveDemoActor(employeeCode)` loads Employee data; public workflow services reload the actor and ignore caller-supplied roles or hierarchy. This is deliberate demo impersonation, not real authentication. The HTTP boundary resolves the demo identity before protected routes.
 
-Services: `submitClaim`, `approveClaim`, `returnClaim`, `resubmitClaim`, `verifyClaimByFinance`, `schedulePayment` and `markClaimPaid`. Run `npm run test:workflow` for offline workflow/service tests. Root `npm test` runs policy, workflow, API and OpenAPI tests; source-dependent `test:seed` stays separate. Tests mock Mongo query boundaries and never change Atlas.
+Services: `submitClaim`, `approveClaim`, `returnClaim`, `resubmitClaim`, `verifyClaimByFinance`, `schedulePayment` and `markClaimPaid`. Run `npm run test:workflow` for offline workflow/service tests. Root `npm test` runs policy, workflow, API, OpenAPI and client tests; source-dependent `test:seed` stays separate. Tests mock Mongo query boundaries and never change Atlas.
 
 Persistent states are `DRAFT`, `MANAGER_REVIEW`, `HOD_REVIEW`, `DIVISION_REVIEW`, `MD_REVIEW`, `FINANCE_REVIEW`, `RETURNED`, `PAYMENT_SCHEDULED` and `PAID`. Submission is an audit event and enters the first required review immediately. Only the claimant submits/resubmits; the exact resolved ancestor approves/returns; Finance actions require a persisted Finance role. No claimant may review their own claim, including Finance review. A claimant occupying a business approval level skips that level and lower levels, escalating to the next higher resolved ancestor; missing/cyclic hierarchy or no higher approver fails safely.
 
@@ -104,3 +104,17 @@ Only the claimant can exclude, restore or resolve an expense in a DRAFT or RETUR
 The contract is maintained in `server/src/openapi/` and does not query MongoDB or read the assignment pack. Swagger loads the same `/openapi.json` document. Normal server startup still requires the existing Atlas configuration. Examples of tax allocations, future scheduling and payment references are explicitly hypothetical; the canonical initial settlement remains provisional.
 
 Run `npm run test:openapi` for offline specification/reference validation, route and schema coverage, canonical example checks and Swagger HTTP tests. Root `npm test` includes this suite. `swagger-ui-express` serves the UI; its TypeScript definitions, `openapi-types` and `@apidevtools/swagger-parser` are development-only typing and contract-validation tools.
+
+## React foundation
+
+The client now provides the approved Nortex shell, React Router, TanStack Query, a native-fetch API client, a small demo identity Context, Lucide icons and one Sonner toast root. CSS Modules use shared tokens based on the external approved prototype. Pages intentionally contain structural placeholders, with no business metrics or workflow actions.
+
+Routes: `/`, `/trips/:travelRequestId`, `/trips/:travelRequestId/evidence`, `/claims/:claimId`, `/approvals`, `/finance` and a not-found fallback. Route identifiers are Mongo document IDs, not business Travel Request IDs. Trip/evidence/claim sidebar entries become links only when a corresponding real route ID is available; no seed ID is invented. Approval and Finance navigation is visible for demo exploration; backend authorization remains authoritative.
+
+`client/.env.example` documents public `VITE_API_BASE_URL`, defaulting to `http://localhost:3000`. Set an HTTP(S) backend origin only, with no credentials, path, query or fragment. Local development works with the default without creating a client environment file. Vite configuration is public browser data; never put secrets in it.
+
+The identity selector loads `/api/v1/demo/users`. It restores a returned employee code from `ai-planet-demo-employee-code`, otherwise selects `NX-4471`, otherwise the first returned user. An empty directory clears the stored code. Storage failures retain in-memory operation. Only the selected code is stored; demo identity is not authentication. Protected API callers pass the current code explicitly as `X-Demo-Employee-Code` and use `queryKeys.actor(code, resource, id?)`; public users have a separate key. Do not use previous-persona placeholder data. Route content remounts on identity changes to discard local view state.
+
+Queries use 30-second freshness, one retry for transient failures, no 4xx retries and no window-focus refetch. Mutations do not retry. Fetch supports cancellation and distinguishes API errors from network failures. Only demo-user lookup is implemented; feature API functions remain for later phases.
+
+Run `npm run test:client` for offline Vitest/Testing Library checks. Root `npm test` includes client and existing server suites; `test:seed` remains separate. Client tests mock fetch and require neither the backend nor the assignment pack. The responsive shell uses a persistent desktop sidebar and a native modal navigation dialog below 900px; the identity row wraps on phones for readable labels.

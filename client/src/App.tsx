@@ -1,8 +1,11 @@
+import { Toaster } from 'sonner';
+import { AppRoutes } from './app/router';
+import { ErrorBoundary } from './components/ErrorBoundary';
 export default function App() {
   return (
-    <main>
-      <h1>Frontend is running</h1>
-      <p>Repository bootstrap is ready.</p>
-    </main>
+    <ErrorBoundary>
+      <AppRoutes />
+      <Toaster position="bottom-right" richColors closeButton />
+    </ErrorBoundary>
   );
 }
