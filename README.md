@@ -1,82 +1,101 @@
 # AI Planet — Expense Reimbursement & Travel Settlement
 
-A full-stack, policy-aware travel expense reimbursement system that converts fragmented travel evidence into a traceable employee claim, validates expenses against company policy, routes the claim through business approvals, and tracks Finance settlement through payment.
-
-The application is built as a production-oriented MERN/TypeScript system with a strong emphasis on:
-
-- evidence traceability
-- deterministic financial rules
-- human review of ambiguity
-- server-authoritative workflow decisions
-- auditability
-- concurrency safety
-- clean frontend/backend boundaries
-
-> This repository is a take-home / engineering demonstration project based on a supplied travel-expense scenario.
-
----
+> A production-oriented MERN/TypeScript take-home project that converts messy travel evidence into an auditable, policy-aware reimbursement workflow — from raw evidence to employee claim, business approvals, Finance review, and payment tracking.
 
 ## Project Links
 
-| Resource           | Link                                                                       |
-| ------------------ | -------------------------------------------------------------------------- |
-| Live Application   | _Will be added after production deployment_                                |
-| Swagger / API Docs | _Will be added after backend deployment_                                   |
-| Repository         | [AI Planet on GitHub](https://github.com/akshaychavan23031998/AI-Planet)   |
-| Portfolio          | [Akshay Chavan — Portfolio](https://akshay-chavan-portfolio.vercel.app/)   |
-| GitHub Profile     | [github.com/akshaychavan23031998](https://github.com/akshaychavan23031998) |
+| Resource                  | Link                                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 🚀 **Live Application**   | [https://ai-planet-client.vercel.app/](https://ai-planet-client.vercel.app/)                           |
+| 📚 **Swagger / API Docs** | [https://ai-planet-server.vercel.app/docs/](https://ai-planet-server.vercel.app/docs/)                 |
+| ❤️ **API Readiness**      | [https://ai-planet-server.vercel.app/ready](https://ai-planet-server.vercel.app/ready)                 |
+| 📄 **OpenAPI JSON**       | [https://ai-planet-server.vercel.app/openapi.json](https://ai-planet-server.vercel.app/openapi.json)   |
+| 💻 **GitHub Repository**  | [https://github.com/akshaychavan23031998/AI-Planet](https://github.com/akshaychavan23031998/AI-Planet) |
+| 👨‍💻 **Author Portfolio**   | [https://akshay-chavan-portfolio.vercel.app/](https://akshay-chavan-portfolio.vercel.app/)             |
+| 🧑‍💻 **GitHub Profile**     | [https://github.com/akshaychavan23031998](https://github.com/akshaychavan23031998)                     |
+
+> **About the author:** Visit [Akshay Chavan's portfolio](https://akshay-chavan-portfolio.vercel.app/) to explore more projects, see professional experience, contact me, or download my latest resume.
+
+---
+
+## Start Here — 60-Second Mental Model
+
+The project solves one core problem:
+
+> **How do we convert fragmented travel evidence into a reimbursement decision without losing traceability or inventing missing facts?**
+
+```mermaid
+flowchart LR
+    A["Raw Evidence"] --> B["Normalized Expenses"]
+    B --> C["Employee Claim Decisions"]
+    C --> D["Deterministic Policy Evaluation"]
+    D --> E["Submission Readiness"]
+    E --> F["Business Approvals"]
+    F --> G["Finance Verification"]
+    G --> H["Settlement"]
+    H --> I["Payment Tracking"]
+```
+
+The entire system is built around four rules:
+
+1. **Preserve source truth.** Evidence and normalized source expenses are never silently rewritten by claim actions.
+2. **Keep financial decisions deterministic.** Policy, settlement, approval routing, authorization, and payment eligibility are backend-controlled.
+3. **Require humans where evidence is ambiguous.** Missing facts are surfaced rather than fabricated.
+4. **Make workflow changes auditable and concurrency-safe.** Claim review history, workflow history, Finance metadata, review cycles, and workflow versions are explicit.
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Business Problem](#business-problem)
-- [What the Application Does](#what-the-application-does)
-- [Demo Scenario](#demo-scenario)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Request Flow](#request-flow)
-- [Technology Stack](#technology-stack)
-- [Repository Structure](#repository-structure)
-- [Domain & Database Design](#domain--database-design)
-- [Evidence and Data Integrity](#evidence-and-data-integrity)
-- [Policy Engine](#policy-engine)
-- [Claim Workflow](#claim-workflow)
-- [Approval Design](#approval-design)
-- [Finance & Settlement](#finance--settlement)
-- [Concurrency & Race Condition Protection](#concurrency--race-condition-protection)
-- [Authorization & Trust Model](#authorization--trust-model)
-- [Frontend Architecture](#frontend-architecture)
-- [API Design](#api-design)
-- [Error Handling](#error-handling)
-- [Engineering Conventions](#engineering-conventions)
-- [Local Development Setup](#local-development-setup)
-- [Environment Variables](#environment-variables)
-- [Database Seeding](#database-seeding)
-- [Running the Application](#running-the-application)
-- [Swagger / OpenAPI](#swagger--openapi)
-- [Demo Personas](#demo-personas)
-- [Recommended Demo Walkthrough](#recommended-demo-walkthrough)
-- [Testing Strategy](#testing-strategy)
-- [Test Commands](#test-commands)
-- [Deployment Architecture](#deployment-architecture)
-- [Deploying to Vercel](#deploying-to-vercel)
-- [MongoDB Atlas Deployment Notes](#mongodb-atlas-deployment-notes)
-- [Security Considerations](#security-considerations)
-- [Assumptions & Limitations](#assumptions--limitations)
-- [AI / LLM Decision](#ai--llm-decision)
-- [Troubleshooting](#troubleshooting)
-- [How to Extend the Project](#how-to-extend-the-project)
-- [Author](#author)
+- [1. Product Overview](#1-product-overview)
+- [2. Business Problem](#2-business-problem)
+- [3. Canonical Demo Scenario](#3-canonical-demo-scenario)
+- [4. Product Roles](#4-product-roles)
+- [5. System Architecture](#5-system-architecture)
+- [6. Request Flow](#6-request-flow)
+- [7. Technology Stack](#7-technology-stack)
+- [8. Repository Structure](#8-repository-structure)
+- [9. Domain and Database Design](#9-domain-and-database-design)
+- [10. Evidence and Data Integrity](#10-evidence-and-data-integrity)
+- [11. Policy Engine](#11-policy-engine)
+- [12. Human-in-the-Loop Resolution](#12-human-in-the-loop-resolution)
+- [13. Claim Workflow](#13-claim-workflow)
+- [14. Approval Routing](#14-approval-routing)
+- [15. Finance and Settlement](#15-finance-and-settlement)
+- [16. Concurrency and Race-Condition Protection](#16-concurrency-and-race-condition-protection)
+- [17. Authorization and Trust Model](#17-authorization-and-trust-model)
+- [18. Frontend Architecture](#18-frontend-architecture)
+- [19. API Design](#19-api-design)
+- [20. Error Handling](#20-error-handling)
+- [21. Engineering Conventions](#21-engineering-conventions)
+- [22. Source of Truth](#22-source-of-truth)
+- [23. Local Development Setup](#23-local-development-setup)
+- [24. Environment Variables](#24-environment-variables)
+- [25. Database Seeding and Reset](#25-database-seeding-and-reset)
+- [26. Running the Application](#26-running-the-application)
+- [27. Swagger and OpenAPI](#27-swagger-and-openapi)
+- [28. Demo Personas](#28-demo-personas)
+- [29. Recommended Demo Walkthrough](#29-recommended-demo-walkthrough)
+- [30. Testing Strategy](#30-testing-strategy)
+- [31. Deployment Architecture](#31-deployment-architecture)
+- [32. Production Deployment Notes](#32-production-deployment-notes)
+- [33. Production Smoke Test](#33-production-smoke-test)
+- [34. Security Considerations](#34-security-considerations)
+- [35. Assumptions and Limitations](#35-assumptions-and-limitations)
+- [36. AI / LLM Decision](#36-ai--llm-decision)
+- [37. Engineering Decision Summary](#37-engineering-decision-summary)
+- [38. How to Extend the Project](#38-how-to-extend-the-project)
+- [39. Troubleshooting](#39-troubleshooting)
+- [40. Future Production Enhancements](#40-future-production-enhancements)
+- [41. Author](#41-author)
 
 ---
 
-# Overview
+# 1. Product Overview
 
-AI Planet is an internal-style employee travel expense settlement application.
+AI Planet is an internal-style employee travel expense reimbursement and settlement application.
 
-It takes a real-world reimbursement problem where information is scattered across:
+It converts fragmented travel information from sources such as:
 
 - travel-request emails
 - approval emails
@@ -84,74 +103,161 @@ It takes a real-world reimbursement problem where information is scattered acros
 - hotel booking vouchers
 - hotel invoices
 - cab receipts
-- failed payment messages
+- failed-payment messages
 - duplicate receipts
 - colleague-forwarded receipts
 - meal / entertainment bills
 - employee hierarchy data
 - company expense policy
 
-and turns that information into a structured, reviewable claim.
+into a structured claim that can be reviewed by an employee, routed through the correct business approvers, verified by Finance, and tracked through settlement.
 
-The core design principle is:
+The project is intentionally built as a **production-oriented engineering demonstration**, not as a simple CRUD application.
+
+Its main engineering concerns are:
+
+- evidence traceability
+- deterministic financial calculations
+- human review of ambiguity
+- backend authorization
+- workflow correctness
+- concurrency safety
+- API contract quality
+- frontend/server state separation
+- deployment readiness
+- auditability
+
+The core product principle is:
 
 > **Never fabricate certainty where the source evidence is incomplete.**
 
-The system distinguishes between:
-
-1. what the source evidence proves,
-2. what deterministic policy rules can conclude,
-3. what still requires human resolution,
-4. and what should never be reimbursed.
-
 ---
 
-# Business Problem
+# 2. Business Problem
 
-Traditional expense reimbursement often requires employees and Finance teams to manually reconcile multiple receipts, emails, policies, approvals and payment methods.
+Expense reimbursement is difficult when evidence, policy, hierarchy, and payment responsibility are scattered across unrelated documents.
 
-This creates several problems:
+Typical failure modes include:
 
-- duplicate claims
-- company-paid expenses accidentally reimbursed again
-- missing receipts
-- unclear ownership
-- policy violations
+- duplicate reimbursement
+- company-paid expenses reimbursed to the employee again
+- failed payments treated as successful expenses
+- missing or ambiguous receipts
+- expense ownership mistakes
+- disallowed subcomponents hidden inside a larger invoice
 - wrong approval routing
-- calculation mistakes
+- missing historical approvals
+- inconsistent calculations
 - stale approval decisions
 - weak audit trails
-- race conditions when multiple reviewers act at the same time
+- simultaneous reviewers overwriting one another
 
-AI Planet models the full flow as:
+The application separates each concern into a clear layer.
 
-```text
-Evidence
-   ↓
-Normalized Expenses
-   ↓
-Employee Claim Decisions
-   ↓
-Policy Evaluation
-   ↓
-Submission Readiness
-   ↓
-Business Approvals
-   ↓
-Finance Verification
-   ↓
-Settlement
-   ↓
-Payment Tracking
+```mermaid
+flowchart TD
+    A["What actually happened?"] --> B["Evidence"]
+    B --> C["What financial events can be derived?"]
+    C --> D["Expenses"]
+    D --> E["What does the employee want to claim?"]
+    E --> F["Claim Decisions"]
+    F --> G["What does policy allow?"]
+    G --> H["Policy Evaluation"]
+    H --> I{"Ready to submit?"}
+    I -- "No" --> J["Resolve or Exclude Blockers"]
+    J --> F
+    I -- "Yes" --> K["Business Approvals"]
+    K --> L["Finance"]
+    L --> M["Settlement"]
+    M --> N["Payment Tracking"]
 ```
 
 ---
 
-# What the Application Does
+# 3. Canonical Demo Scenario
 
-The system allows a reviewer to move from raw travel evidence to a final financial settlement while preserving auditability.
+The seeded scenario follows **Chaitanya Reddy (`NX-4471`)** on a Pune → Bengaluru → Pune business trip in June 2026.
 
-### Employee experience
+## Source-backed facts
+
+| Item                       | Fact                        |
+| -------------------------- | --------------------------- |
+| Employee                   | Chaitanya Reddy             |
+| Employee code              | `NX-4471`                   |
+| Route                      | Pune → Bengaluru → Pune     |
+| Travel request window      | 16–20 June 2026             |
+| Estimated spend            | ₹48,000                     |
+| Travel advance             | ₹20,000                     |
+| Flights                    | Company-paid                |
+| Hotel                      | Employee-paid final invoice |
+| Historical RM approval     | Present                     |
+| Historical HOD approval    | Not proven                  |
+| Actual Travel Request ID   | Unknown                     |
+| Settlement submission date | Not supplied                |
+| Planned hotel nights       | 4                           |
+| Hotel invoice nights       | 3                           |
+
+## Why this is intentionally messy
+
+The scenario includes:
+
+- a failed Uber payment followed by a successful payment
+- a duplicate Uber receipt
+- a receipt belonging to another employee
+- marketing / promotional noise
+- company-paid flights
+- a hotel invoice containing both allowed and disallowed components
+- mixed hotel tax that cannot be uniquely allocated from source evidence
+- a business dinner with insufficient attendee / approval evidence
+- incomplete historical pre-travel approval proof
+
+These records are not removed just because they make the scenario harder.
+
+They remain visible because **traceability is more important than making the claim look clean**.
+
+## Hotel example
+
+The final hotel invoice is ₹21,504:
+
+| Component |      Amount |
+| --------- | ----------: |
+| Room      |     ₹17,250 |
+| Laundry   |        ₹450 |
+| Minibar   |        ₹380 |
+| Dining    |      ₹1,120 |
+| Taxes     |      ₹2,304 |
+| **Total** | **₹21,504** |
+
+The room is ₹5,750/night over 3 nights, below the Tier-1 lodging cap of ₹6,000/night excluding tax.
+
+Laundry and minibar are disallowed.
+
+The tax is intentionally unresolved until reviewed because the source invoice does not prove a unique reimbursable-vs-disallowed tax allocation.
+
+---
+
+# 4. Product Roles
+
+```mermaid
+flowchart LR
+    Employee["Employee"] --> E1["Review Trip"]
+    Employee --> E2["Inspect Evidence"]
+    Employee --> E3["Review Expenses"]
+    Employee --> E4["Resolve / Exclude"]
+    Employee --> E5["Submit Claim"]
+
+    Approver["Business Approver"] --> A1["View Assigned Queue"]
+    Approver --> A2["Inspect Policy & Evidence"]
+    Approver --> A3["Approve / Return"]
+
+    Finance["Finance"] --> F1["View Finance Queue"]
+    Finance --> F2["Verify"]
+    Finance --> F3["Return if Needed"]
+    Finance --> F4["Schedule Payment"]
+    Finance --> F5["Mark Paid"]
+```
+
+## Employee
 
 The employee can:
 
@@ -159,30 +265,28 @@ The employee can:
 - inspect source evidence
 - inspect normalized expenses
 - see policy findings
-- see eligible, disallowed and unresolved amounts
-- exclude items intentionally
-- restore excluded items
-- explicitly resolve supported ambiguity
-- view the settlement
-- check submission readiness
-- submit the claim
-- review returned claims
-- correct and resubmit
+- see eligible, disallowed, excluded, and unresolved amounts
+- exclude an item
+- restore an item
+- resolve supported ambiguity
+- check readiness
+- view settlement
+- submit
+- correct a returned claim
+- resubmit
 
-### Approver experience
+## Business approver
 
-Assigned business approvers can:
+Assigned approvers can:
 
-- view only claims currently assigned to them
-- inspect claim context
-- inspect evidence
-- inspect policy findings
-- inspect settlement
-- inspect prior workflow history
+- see claims currently assigned to them
+- inspect claim context and evidence
+- inspect policy findings and settlement
+- inspect workflow history
 - approve
-- return a claim with remarks
+- return with remarks
 
-### Finance experience
+## Finance
 
 Authorized Finance users can:
 
@@ -190,267 +294,169 @@ Authorized Finance users can:
 - inspect approved claims
 - verify Finance review
 - return a claim
-- schedule an employee reimbursement
+- schedule reimbursement when settlement is payable
 - record completed payment
-- preserve payment metadata and audit history
+- preserve Finance/payment audit history
 
 ---
 
-# Demo Scenario
+# 5. System Architecture
 
-The canonical scenario follows **Chaitanya Reddy (`NX-4471`)** on a Pune → Bengaluru → Pune business trip during June 2026.
-
-Important source facts include:
-
-| Item                     | Source-backed fact                                    |
-| ------------------------ | ----------------------------------------------------- |
-| Employee                 | Chaitanya Reddy                                       |
-| Employee code            | `NX-4471`                                             |
-| Route                    | Pune → Bengaluru → Pune                               |
-| Travel dates             | 16–20 June 2026                                       |
-| Estimated spend          | ₹48,000                                               |
-| Travel advance           | ₹20,000                                               |
-| Flights                  | Company-paid                                          |
-| Hotel                    | Employee-paid final invoice                           |
-| Business dinner          | Requires additional review                            |
-| Hotel tax                | Mixed final-invoice tax requiring explicit resolution |
-| Historical RM approval   | Present                                               |
-| Historical HOD approval  | Not proven                                            |
-| Actual Travel Request ID | Unknown                                               |
-
-The scenario deliberately includes messy evidence:
-
-- a failed Uber payment followed by a successful payment
-- a duplicate Uber receipt
-- a receipt belonging to another employee
-- marketing/promo content
-- company-paid flights
-- a hotel invoice containing both allowed and disallowed components
-- unresolved tax allocation
-- a dinner lacking sufficient approval / attendee information
-
-These are **not silently cleaned up or discarded**.
-
-They remain visible because traceability is more important than making the claim appear simpler.
-
----
-
-# Key Features
-
-### Evidence ingestion and traceability
-
-- deterministic import from the supplied assignment pack
-- email parsing
-- receipt metadata preservation
-- duplicate relationships
-- source-to-expense links
-- evidence detail drawer
-- searchable/filterable evidence
-
-### Expense normalization
-
-- company-paid vs employee-paid separation
-- source amount preservation
-- duplicate handling
-- failed-payment handling
-- claimant mismatch detection
-- mixed invoice componentization
-
-### Deterministic policy engine
-
-- proof requirements
-- lodging limits
-- meal limits
-- entertainment rules
-- company-paid handling
-- known disallowances
-- duplicate detection
-- travel approval requirements
-- claim approval routing
-- advance assessment
-- settlement calculation
-- readiness evaluation
-
-### Human-in-the-loop ambiguity resolution
-
-The system never invents:
-
-- missing approval
-- missing attendee identities
-- missing Travel Request ID
-- final mixed-tax allocation
-
-Human decisions are recorded explicitly against the Claim.
-
-### Workflow and approvals
-
-- manager review
-- HOD review
-- division review
-- MD review
-- Finance review
-- return / correction / resubmission
-- multi-cycle workflow history
-
-### Finance workflow
-
-- Finance verification
-- payable / recoverable / zero settlement distinction
-- payment-run scheduling
-- payment completion reference
-- audit history
-
-### Reliability
-
-- safe integer money representation
-- actor-scoped frontend cache
-- centralized API errors
-- conditional workflow writes
-- race-condition detection
-- deterministic seed
-- automated tests
-- OpenAPI contract
-
----
-
-# Architecture
-
-The project is intentionally implemented as a simple, maintainable full-stack architecture rather than premature microservices.
+The project intentionally uses a simple full-stack architecture instead of premature microservices.
 
 ```mermaid
 flowchart LR
     User["Employee / Approver / Finance User"]
 
-    subgraph Frontend["Frontend — React / Vite"]
+    subgraph Frontend["Frontend — React + Vite"]
         Router["React Router"]
         Query["TanStack Query"]
-        UI["Pages & Components"]
+        Context["Demo Identity Context"]
         Forms["React Hook Form + Zod"]
+        UI["Pages & Components"]
     end
 
-    subgraph Backend["Backend — Node.js / Express"]
-        API["REST API /api/v1"]
-        Validation["Zod Validation"]
-        Authz["Identity & Authorization"]
-        Policy["Deterministic Policy Engine"]
-        Workflow["Claim Workflow Engine"]
-        Serializer["API Serializers"]
+    subgraph Backend["Backend — Node.js + Express"]
+        HTTP["REST API /api/v1"]
+        Input["Zod Validation"]
+        Identity["Identity Resolution"]
+        Authz["Authorization"]
+        Policy["Policy Engine"]
+        Workflow["Claim Workflow"]
+        Serializer["Serializers"]
+        Error["Error Mapping"]
     end
 
     DB[("MongoDB Atlas")]
 
     User --> UI
     UI --> Router
-    UI --> Query
+    UI --> Context
     UI --> Forms
-    Query --> API
-
-    API --> Validation
-    API --> Authz
-    API --> Policy
-    API --> Workflow
+    UI --> Query
+    Query --> HTTP
+    HTTP --> Input
+    Input --> Identity
+    Identity --> Authz
+    Authz --> Policy
+    Authz --> Workflow
     Policy --> DB
     Workflow --> DB
-    API --> Serializer
-    Serializer --> Query
+    DB --> Policy
+    DB --> Workflow
+    Policy --> Serializer
+    Workflow --> Serializer
+    Serializer --> HTTP
+    HTTP --> Query
+    HTTP --> Error
 ```
 
-## Deployment topology
+## Architectural ownership
 
 ```mermaid
-flowchart LR
-    Browser["Browser"]
-    Frontend["Vercel Project<br/>client/"]
-    Backend["Vercel Project<br/>server/"]
-    Atlas[("MongoDB Atlas")]
+flowchart TD
+    UI["Frontend UI"] --> APIClient["Typed API Client"]
+    APIClient --> HTTP["HTTP Boundary"]
+    HTTP --> Domain["Domain Rules"]
+    Domain --> Persistence["Persistence"]
+    Persistence --> Mongo["MongoDB"]
 
-    Browser --> Frontend
-    Frontend --> Backend
-    Backend --> Atlas
+    UI -. "does not own policy" .-> Domain
+    APIClient -. "does not grant roles" .-> HTTP
+    Persistence -. "does not leak Mongoose docs" .-> UI
 ```
 
-The same Git repository contains both deployable applications.
+### Frontend owns
 
-They are deployed independently:
+- presentation
+- routing
+- user interaction
+- local UI state
+- server-state caching
+- forms
+- display formatting
 
-```text
-GitHub Repository
-│
-├── client/   → Vercel Frontend Project
-│
-└── server/   → Vercel Backend Project
-```
+### Backend owns
 
-This keeps:
+- identity resolution
+- authorization
+- policy
+- settlement
+- approval routing
+- workflow transitions
+- concurrency protection
+- persistence
+- public API contracts
 
-- one source repository
-- independent deployment lifecycles
-- independent environment variables
-- clear frontend/backend boundaries
+### MongoDB owns
 
-without introducing unnecessary infrastructure.
+- durable domain state
+- source evidence
+- normalized expenses
+- employee hierarchy
+- Claim review decisions
+- approval/Finance workflow state
 
 ---
 
-# Request Flow
+# 6. Request Flow
 
-A typical read request follows:
+## Read request
 
-```text
-React Component
-    ↓
-TanStack Query Hook
-    ↓
-Typed Native-Fetch API Client
-    ↓
-X-Demo-Employee-Code
-    ↓
-Express Route
-    ↓
-Identity Middleware
-    ↓
-Query / Domain Service
-    ↓
-Mongoose
-    ↓
-MongoDB Atlas
-    ↓
-Serializer
-    ↓
-JSON Response
-    ↓
-TanStack Query Cache
-    ↓
-React UI
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as React UI
+    participant Query as TanStack Query
+    participant API as Express API
+    participant Auth as Identity/Authz
+    participant DB as MongoDB
+    participant S as Serializer
+
+    User->>UI: Open trip / claim / evidence
+    UI->>Query: Request server state
+    Query->>API: GET + X-Demo-Employee-Code
+    API->>Auth: Resolve actor and permission
+    Auth-->>API: Authorized identity
+    API->>DB: Query allowed data
+    DB-->>API: Documents
+    API->>S: Serialize
+    S-->>API: Public DTO
+    API-->>Query: JSON
+    Query-->>UI: Cached server state
+    UI-->>User: Render
 ```
 
-A financial mutation follows a stricter path:
+## Financial mutation
 
-```text
-Form
- ↓
-React Hook Form + Zod
- ↓
-API Request
- ↓
-Backend Zod Validation
- ↓
-Backend Authorization
- ↓
-Policy / Workflow Validation
- ↓
-Conditional MongoDB Update
- ↓
-Refetch Authoritative State
- ↓
-UI
+```mermaid
+sequenceDiagram
+    actor User
+    participant Form as RHF + Zod
+    participant API as Express API
+    participant Validation as Backend Zod
+    participant Domain as Policy / Workflow
+    participant DB as MongoDB
+    participant Query as TanStack Query
+
+    User->>Form: Submit action
+    Form->>API: POST request
+    API->>Validation: Validate body
+    Validation-->>API: Parsed input
+    API->>Domain: Authorize + evaluate state
+    Domain->>DB: Conditional write
+    DB-->>Domain: Updated / conflict
+    Domain-->>API: Authoritative result
+    API-->>Query: Response
+    Query->>API: Refetch affected state
+    API-->>Query: Latest state
 ```
 
-The frontend never decides that a financial mutation succeeded based only on local state.
+The client never decides that a financial mutation succeeded based only on local optimistic state.
 
 ---
 
-# Technology Stack
+# 7. Technology Stack
 
 ## Frontend
 
@@ -464,79 +470,49 @@ The frontend never decides that a financial mutation succeeded based only on loc
 | React Hook Form   | Form state                    |
 | Zod               | Client validation             |
 | Native `fetch`    | HTTP client                   |
-| CSS Modules       | Component styling             |
+| CSS Modules       | Scoped styling                |
 | Shared CSS tokens | Design consistency            |
 | Lucide React      | Icons                         |
-| Sonner            | Mutation notifications        |
+| Sonner            | Notifications                 |
 | Vitest            | Frontend tests                |
 | Testing Library   | UI behavior tests             |
 | jsdom             | Browser-like test environment |
 
 ## Backend
 
-| Technology             | Responsibility                 |
-| ---------------------- | ------------------------------ |
-| Node.js                | Runtime                        |
-| Express                | HTTP API                       |
-| TypeScript             | Static typing                  |
-| MongoDB Atlas          | Persistent database            |
-| Mongoose               | ODM                            |
-| Zod                    | Environment/request validation |
-| Pino / pino-http       | Structured logging             |
-| Mailparser             | Email source parsing           |
-| csv-parse              | Employee master parsing        |
-| OpenAPI 3.0.3          | API contract                   |
-| Swagger UI             | Interactive API documentation  |
-| Supertest              | API integration tests          |
-| Node test runner + tsx | Backend domain tests           |
+| Technology               | Responsibility                 |
+| ------------------------ | ------------------------------ |
+| Node.js                  | Runtime                        |
+| Express                  | HTTP API                       |
+| TypeScript               | Static typing                  |
+| MongoDB Atlas            | Persistent database            |
+| Mongoose                 | ODM                            |
+| Zod                      | Environment/request validation |
+| Pino / pino-http         | Structured logging             |
+| Mailparser               | Email source parsing           |
+| csv-parse                | Employee CSV parsing           |
+| OpenAPI 3.0.3            | API contract                   |
+| Swagger UI               | Interactive API documentation  |
+| Supertest                | API integration tests          |
+| Node test runner + `tsx` | Backend tests                  |
 
 ---
 
-# Repository Structure
+# 8. Repository Structure
 
 ```text
 AI-Planet/
 │
 ├── client/
 │   ├── src/
-│   │   ├── api/
-│   │   │   ├── client.ts
-│   │   │   ├── claims.ts
-│   │   │   ├── claimTypes.ts
-│   │   │   ├── evidence.ts
-│   │   │   ├── expenses.ts
-│   │   │   ├── travelRequests.ts
-│   │   │   └── workflow.ts
-│   │   │
-│   │   ├── app/
-│   │   │   ├── queryClient.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── claimQueries.ts
-│   │   │   ├── workflowQueries.ts
-│   │   │   └── router.tsx
-│   │   │
-│   │   ├── components/
-│   │   │   ├── claims/
-│   │   │   ├── AppShell.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   ├── Header.tsx
-│   │   │   ├── EvidenceDrawer.tsx
-│   │   │   └── ...
-│   │   │
-│   │   ├── context/
-│   │   │   └── DemoIdentityProvider.tsx
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── DashboardPage.tsx
-│   │   │   ├── TripPage.tsx
-│   │   │   ├── EvidencePage.tsx
-│   │   │   ├── ClaimPage.tsx
-│   │   │   └── ReviewWorkspace.tsx
-│   │   │
+│   │   ├── api/          # Typed browser API calls
+│   │   ├── app/          # Router, query client, query hooks
+│   │   ├── components/   # Reusable UI
+│   │   ├── context/      # Demo identity context
+│   │   ├── pages/        # Route-level pages
 │   │   ├── styles/
 │   │   ├── test/
 │   │   └── utils/
-│   │
 │   ├── .env.example
 │   ├── package.json
 │   ├── vite.config.ts
@@ -544,25 +520,22 @@ AI-Planet/
 │
 ├── server/
 │   ├── src/
-│   │   ├── api/
-│   │   │   └── v1/
-│   │   │
+│   │   ├── api/v1/       # HTTP boundary
 │   │   ├── domain/
-│   │   │   ├── policy/
-│   │   │   └── claims/
-│   │   │
-│   │   ├── modules/
-│   │   ├── openapi/
-│   │   ├── seed/
+│   │   │   ├── policy/   # Financial/policy rules
+│   │   │   └── claims/   # Workflow/approvals/Finance
+│   │   ├── modules/      # Mongoose models
+│   │   ├── openapi/      # OpenAPI + contract tests
+│   │   ├── seed/         # Deterministic pack import
 │   │   ├── app.ts
 │   │   ├── database.ts
 │   │   ├── env.ts
 │   │   ├── errorHandler.ts
 │   │   └── server.ts
-│   │
 │   ├── .env.example
 │   ├── package.json
-│   └── tsconfig.json
+│   ├── tsconfig.json
+│   └── vercel.json
 │
 ├── docs/
 │   └── canonical-assignment-data.md
@@ -574,81 +547,26 @@ AI-Planet/
 
 ## Directory responsibilities
 
-### `client/src/api`
-
-Typed browser API calls.
-
-No UI logic belongs here.
-
-### `client/src/app`
-
-Application-level query hooks, router configuration and TanStack Query behavior.
-
-### `client/src/components`
-
-Reusable presentation and interaction components.
-
-### `client/src/context`
-
-Small cross-application state.
-
-Currently used only for demo identity selection.
-
-### `client/src/pages`
-
-Route-level compositions.
-
-Pages orchestrate reusable components and queries rather than implementing backend policy.
-
-### `server/src/api/v1`
-
-HTTP boundary:
-
-- routes
-- identity middleware
-- validation
-- query orchestration
-- serializers
-- API error mapping
-
-### `server/src/domain/policy`
-
-Pure financial and policy evaluation.
-
-This layer should not depend on Express or React.
-
-### `server/src/domain/claims`
-
-Claim workflow, authorization, approval routing, Finance actions and concurrency rules.
-
-### `server/src/modules`
-
-Mongoose persistence models.
-
-### `server/src/openapi`
-
-OpenAPI specification and contract tests.
-
-### `server/src/seed`
-
-Deterministic assignment-pack import.
-
-### `docs/canonical-assignment-data.md`
-
-Frozen interpretation of the provided source pack.
-
-This document separates:
-
-- source facts
-- deterministic conclusions
-- product decisions
-- unresolved facts
+| Directory                           | Responsibility                                                 |
+| ----------------------------------- | -------------------------------------------------------------- |
+| `client/src/api`                    | Typed browser API calls                                        |
+| `client/src/app`                    | Query hooks, router, server-state behavior                     |
+| `client/src/components`             | Reusable presentation and interaction                          |
+| `client/src/context`                | Small app-wide demo identity state                             |
+| `client/src/pages`                  | Route-level compositions                                       |
+| `server/src/api/v1`                 | Routes, identity, validation, query orchestration, serializers |
+| `server/src/domain/policy`          | Pure deterministic policy/financial evaluation                 |
+| `server/src/domain/claims`          | Claim workflow, approvals, Finance, concurrency                |
+| `server/src/modules`                | Mongoose persistence models                                    |
+| `server/src/openapi`                | OpenAPI contract and tests                                     |
+| `server/src/seed`                   | Deterministic assignment-pack import                           |
+| `docs/canonical-assignment-data.md` | Frozen source interpretation                                   |
 
 ---
 
-# Domain & Database Design
+# 9. Domain and Database Design
 
-The application persists five major domain areas.
+The application persists five major business areas.
 
 ```mermaid
 erDiagram
@@ -657,269 +575,231 @@ erDiagram
     TRAVEL_REQUEST ||--o{ EXPENSE : normalizes
     TRAVEL_REQUEST ||--o| CLAIM : settles
     EMPLOYEE ||--o{ CLAIM : submits
+
+    EMPLOYEE {
+        ObjectId _id
+        string employeeCode
+        string name
+        string organizationalRole
+        ObjectId reportingManager
+    }
+
+    TRAVEL_REQUEST {
+        ObjectId _id
+        ObjectId employee
+        string travelRequestId
+        int estimatedAmountMinor
+        int advanceMinor
+    }
+
+    EVIDENCE {
+        ObjectId _id
+        ObjectId travelRequest
+        string kind
+        string classification
+    }
+
+    EXPENSE {
+        ObjectId _id
+        ObjectId travelRequest
+        string category
+        int amountMinor
+        string paymentResponsibility
+    }
+
+    CLAIM {
+        ObjectId _id
+        ObjectId employee
+        ObjectId travelRequest
+        string status
+        int reviewCycle
+        int workflowVersion
+    }
 ```
 
-## Employee
+## Why these five areas?
 
-Represents:
+1. **Employees** — identity and organization hierarchy.
+2. **Travel Requests** — pre-travel context.
+3. **Evidence** — source truth.
+4. **Expenses** — normalized financial events.
+5. **Claims** — employee review decisions and workflow.
 
-- employee code
-- organizational role
-- department
-- cost centre
-- city
-- reporting manager
+Approvals and Finance are embedded within the Claim because they are lifecycle state for that Claim rather than independent domain aggregates in this assignment.
 
-Employee data is also the authority for demo-role resolution.
-
-## TravelRequest
-
-Represents pre-travel context such as:
-
-- claimant
-- route
-- dates
-- purpose
-- estimate
-- advance
-- historical approval evidence
-
-Travel Request approval and final Claim approval are intentionally separate concepts.
-
-## Evidence
-
-Evidence is the preserved source layer.
-
-Examples:
-
-- emails
-- tickets
-- booking vouchers
-- cab receipts
-- failed payments
-- duplicate receipts
-- hotel invoice
-- dinner receipt
-
-Evidence answers:
-
-> **What did the source material actually say?**
-
-## Expense
-
-Expense is the normalized financial-event layer.
-
-Examples:
-
-- outbound flight
-- return flight
-- Uber ride
-- hotel room
-- laundry
-- minibar
-- hotel dining
-- hotel tax
-- business dinner
-
-Expense answers:
-
-> **What cost event can be derived from the evidence?**
-
-## Claim
-
-Claim represents employee reimbursement decisions and workflow state.
-
-It contains concepts such as:
-
-- expense reviews
-- exclusion decisions
-- manual resolutions
-- review history
-- approval route
-- approval decisions
-- workflow history
-- review cycle
-- workflow version
-- Finance metadata
-
-Claim answers:
-
-> **What is being requested for reimbursement, how was it reviewed, and where is it in the workflow?**
-
----
-
-# Database Design Principles
+## Important modeling rules
 
 ### MongoDB ObjectIds
 
-MongoDB ObjectIds are used for internal document identity.
-
-The application's route IDs are database document IDs.
+MongoDB ObjectIds are internal document identity.
 
 They are **not** the business Travel Request ID.
 
-The actual business Travel Request ID in the source scenario is unknown and is intentionally not invented.
+The real Travel Request ID is absent from the supplied source, so the application leaves it unknown rather than using a fabricated example ID.
 
 ### Money
 
-All backend money is represented as integer **paise**.
-
-Example:
+All backend money is integer **paise**.
 
 ```text
 ₹1,415.02
-→ 141502 paise
+→ 141502
 ```
-
-This prevents financial logic from depending on binary floating-point arithmetic.
 
 ### Business dates
 
-Business dates such as:
+Date-only facts use:
 
 ```text
-2026-06-18
+YYYY-MM-DD
 ```
 
-remain `YYYY-MM-DD` strings where the time of day is not meaningful.
+Timestamps use actual date-time semantics.
 
-Timestamps are stored as actual date-time values.
+### Source immutability
 
-### Immutable source truth
+Employee review actions do not rewrite original Evidence or normalized Expense records.
 
-Employee Claim decisions never modify original Evidence or Expense records.
-
-An employee excluding an expense means:
-
-```text
-Source Expense remains unchanged
-+
-Claim stores an exclusion decision
+```mermaid
+flowchart LR
+    Evidence["Evidence"] --> Expense["Expense"]
+    Expense --> Claim["Claim Review Decisions"]
+    Claim -. "never rewrites" .-> Evidence
+    Claim -. "never rewrites" .-> Expense
 ```
-
-This keeps auditability intact.
 
 ---
 
-# Evidence and Data Integrity
+# 10. Evidence and Data Integrity
 
-The application intentionally preserves inconvenient evidence.
+The application deliberately preserves inconvenient evidence.
 
-Examples:
+## Duplicate receipt
 
-### Duplicate receipt
-
-Both the canonical receipt and the duplicate evidence remain visible.
+Both the canonical receipt and duplicate evidence remain visible.
 
 The duplicate must not create a second reimbursement.
 
-### Failed payment
+## Failed payment
 
-A failed payment remains in Evidence because it explains the subsequent successful payment.
+A failed payment remains in Evidence because it explains the later successful transaction.
 
 It is not reimbursable itself.
 
-### Claimant mismatch
+## Claimant mismatch
 
 A receipt belonging to another employee remains visible but cannot silently become the claimant's expense.
 
-### Company-paid flight
+## Company-paid flight
 
-The flight remains visible as travel cost, but its employee reimbursement amount is zero.
+Flights remain visible as travel cost and audit evidence, but employee reimbursement is zero.
 
-### Missing information
+## Missing information
 
 The system does not invent:
 
 - HOD approval
 - dinner attendee names
 - Travel Request ID
-- final tax allocation
+- settlement submission date
+- mixed tax allocation
+- employee-vs-company estimate split needed to prove advance-cap compliance
 
 ---
 
-# Policy Engine
+# 11. Policy Engine
 
-Financial policy evaluation is deterministic and backend-authoritative.
+The backend policy engine is authoritative.
 
-The main policy layer lives under:
+Main location:
 
 ```text
 server/src/domain/policy/
 ```
 
-It evaluates plain domain data rather than UI state.
+It evaluates:
 
-## Policy categories
-
-The evaluator covers rules such as:
-
-- expense proof
-- employee-paid vs company-paid
-- duplicate recognition
+- proof requirements
+- employee-paid vs company-paid responsibility
+- duplicates
 - failed payments
-- lodging allowance
+- lodging limits
 - disallowed hotel components
 - hotel dining
 - mixed hotel tax
-- meal limits
-- business entertainment
+- meal / entertainment rules
 - historical travel approvals
-- Claim approval thresholds
+- claim approval thresholds
 - advance assessment
 - settlement
 - submission readiness
 
-## Final vs provisional settlement
+## Evaluation flow
 
-The system distinguishes:
-
-```text
-Known eligible
-Known disallowed
-Unresolved
-Excluded
+```mermaid
+flowchart TD
+    A["Expense + Evidence + Claim Decision"] --> B{"Company paid?"}
+    B -- "Yes" --> C["Audit visible / reimbursable = 0"]
+    B -- "No" --> D{"Duplicate, failed, or wrong owner?"}
+    D -- "Yes" --> E["Not reimbursable"]
+    D -- "No" --> F{"Policy clearly satisfied?"}
+    F -- "Yes" --> G["Eligible"]
+    F -- "No" --> H{"Clearly disallowed?"}
+    H -- "Yes" --> I["Disallowed"]
+    H -- "No" --> J["Unresolved / human review"]
+    G --> K["Settlement"]
+    I --> K
+    J --> K
 ```
 
-If unresolved included amounts remain, the settlement is provisional.
+## Provisional vs final settlement
 
-In that situation:
+The engine distinguishes:
+
+```text
+eligible
+disallowed
+excluded
+unresolved
+```
+
+If an included amount is unresolved:
 
 ```text
 payableMinor = null
 recoverableMinor = null
 ```
 
-The UI displays this as pending resolution rather than pretending the result is ₹0.
+The UI therefore shows an unresolved settlement instead of pretending the final result is ₹0.
 
 ---
 
-# Human-in-the-Loop Resolution
+# 12. Human-in-the-Loop Resolution
 
-The project intentionally does not use automation to manufacture missing facts.
+The project does not use automation to manufacture missing facts.
 
-A good example is final hotel tax.
+A representative example is hotel tax.
 
-The hotel invoice provides combined tax across multiple folio components.
+```mermaid
+flowchart TD
+    A["Mixed hotel tax"] --> B["Source cannot prove unique allocation"]
+    B --> C["Mark unresolved"]
+    C --> D["Block final settlement"]
+    D --> E["Human reviews invoice"]
+    E --> F["Explicit allocation + reason"]
+    F --> G["Store on Claim"]
+    G --> H["Re-evaluate policy"]
+```
 
-The source material does not prove a unique final allocation.
+The source invoice remains unchanged.
 
-Therefore the application:
-
-1. preserves the original tax evidence,
-2. reports the ambiguity,
-3. blocks final settlement,
-4. allows an explicit reviewed allocation,
-5. records who resolved it,
-6. records the reason.
-
-This is different from silently changing the source invoice.
+The manual decision belongs to the Claim and is auditable.
 
 ---
 
-# Claim Workflow
+# 13. Claim Workflow
 
-Persistent Claim states are exactly:
+Persistent states are exactly:
 
 ```text
 DRAFT
@@ -933,12 +813,11 @@ PAYMENT_SCHEDULED
 PAID
 ```
 
-`SUBMITTED` and `RESUBMITTED` are **workflow history events**, not stored Claim statuses.
+`SUBMITTED` and `RESUBMITTED` are workflow events, not persistent statuses.
 
 ```mermaid
 stateDiagram-v2
     [*] --> DRAFT
-
     DRAFT --> MANAGER_REVIEW: submit
 
     MANAGER_REVIEW --> HOD_REVIEW: approve if required
@@ -958,242 +837,242 @@ stateDiagram-v2
 
     RETURNED --> MANAGER_REVIEW: resubmit / recalculated route
 
-    FINANCE_REVIEW --> PAYMENT_SCHEDULED: payable + verified
+    FINANCE_REVIEW --> PAYMENT_SCHEDULED: verified + payable
     PAYMENT_SCHEDULED --> PAID: payment completed
-
     PAID --> [*]
 ```
 
-Not every claim passes through every business-review state.
+Not every Claim passes through every approval state.
 
-The backend calculates the required route.
-
----
-
-# Approval Design
-
-Two approval concepts exist.
-
-## Travel Request approval
-
-Based on the **estimated pre-travel spend**.
-
-For the canonical scenario:
-
-```text
-Estimated spend = ₹48,000
-```
-
-The current policy requires:
-
-```text
-Reporting Manager
-+
-Head of Department
-```
-
-The supplied evidence proves only the Reporting Manager approval.
-
-The missing HOD approval remains a historical warning.
-
-## Expense Claim approval
-
-Final Claim routing uses the actual Claim amount being requested under policy.
-
-This is different from pre-travel routing.
-
-The frontend never implements threshold logic independently.
-
-The backend determines:
-
-- required approval levels
-- exact assigned approver
-- next workflow state
+The backend determines the route.
 
 ---
 
-# Finance & Settlement
+# 14. Approval Routing
 
-Finance is a mandatory review stage.
+There are two separate approval concepts.
+
+## Pre-travel Travel Request approval
+
+Uses the **estimated pre-travel spend**.
+
+For this scenario:
+
+```text
+₹48,000
+```
+
+That falls into the RM + HOD band.
+
+The source proves the Reporting Manager approval, but HOD approval is not proven.
+
+That remains a visible historical policy issue.
+
+## Settlement Claim approval
+
+Uses the actual Claim amount under policy.
+
+The frontend does not reproduce threshold logic.
+
+|               Amount | Required business approval                       |
+| -------------------: | ------------------------------------------------ |
+|        Up to ₹25,000 | Reporting Manager                                |
+|    ₹25,001 – ₹75,000 | Reporting Manager + HOD                          |
+|  ₹75,001 – ₹2,00,000 | Reporting Manager + HOD + Division Head          |
+|      Above ₹2,00,000 | Reporting Manager + HOD + Division Head + MD/CEO |
+| International travel | MD/CEO also required                             |
+|    Every final Claim | Finance review required                          |
+
+```mermaid
+flowchart TD
+    A["Actual Claim Amount"] --> B{"≤ ₹25k?"}
+    B -- "Yes" --> RM["Manager"]
+    B -- "No" --> C{"≤ ₹75k?"}
+    C -- "Yes" --> HOD["Manager → HOD"]
+    C -- "No" --> D{"≤ ₹2L?"}
+    D -- "Yes" --> DIV["Manager → HOD → Division"]
+    D -- "No" --> MD["Manager → HOD → Division → MD/CEO"]
+
+    RM --> INTL{"International?"}
+    HOD --> INTL
+    DIV --> INTL
+    MD --> FIN["Finance"]
+
+    INTL -- "Yes" --> MDI["Ensure MD/CEO"]
+    INTL -- "No" --> FIN
+    MDI --> FIN
+```
+
+---
+
+# 15. Finance and Settlement
+
+Finance is mandatory.
+
+The settlement model separates:
+
+- employee-paid
+- company-paid
+- eligible
+- disallowed
+- excluded
+- unresolved
+- advance
+- payable
+- recoverable
+
+```mermaid
+flowchart TD
+    A["Final Settlement"] --> B{"Direction"}
+    B -- "Company owes employee" --> P["PAYABLE"]
+    B -- "Employee owes company" --> R["RECOVERABLE"]
+    B -- "Nothing due" --> Z["ZERO"]
+
+    P --> S["Schedule reimbursement"]
+    R --> N1["Do not create fake payment"]
+    Z --> N2["Do not create unnecessary payment state"]
+```
 
 ## Finance verification
 
-Finance verification records the current-cycle Finance decision.
+Verification records Finance review for the current cycle.
 
-It may leave the Claim status as:
-
-```text
-FINANCE_REVIEW
-```
-
-Verification does not automatically mean payment.
-
-## Settlement directions
-
-A final settlement can be:
-
-```text
-PAYABLE
-RECOVERABLE
-ZERO
-```
-
-### PAYABLE
-
-Company owes money to the employee.
-
-Eligible for reimbursement scheduling.
-
-### RECOVERABLE
-
-Employee owes money back to the company.
-
-No fake reimbursement payment is created.
-
-### ZERO
-
-No amount is payable or recoverable.
-
-No unnecessary payment state is fabricated.
+It does not automatically mean payment.
 
 ## Payment scheduling
 
-For payable settlements, the backend enforces payment-run dates.
-
-Supported payment runs occur on:
+Payable settlements can be scheduled for supported payment-run dates:
 
 ```text
 10th
-or
 25th
 ```
 
-and must not be in the past.
+The date cannot be in the past.
 
 ## Mark paid
 
-Marking payment complete requires:
+Requires:
 
-- an eligible scheduled payment
-- the scheduled date to have arrived
-- a non-empty payment reference
+- payable settlement
+- scheduled payment
+- scheduled date reached
+- non-empty payment reference
 
-The project records payment metadata only.
-
-It does not connect to a real bank or payroll provider.
+No real bank/payroll integration is performed.
 
 ---
 
-# Concurrency & Race Condition Protection
+# 16. Concurrency and Race-Condition Protection
 
-Claim workflow updates use conditional MongoDB writes.
+Workflow writes use optimistic concurrency.
 
-A mutation validates multiple pieces of expected state, including:
+Mutations validate expected state such as:
 
 ```text
 Claim ID
 claimant
-expected status
+status
 review cycle
 workflow version
 ```
 
-The Claim maintains a monotonically increasing:
+The Claim maintains:
 
 ```text
 workflowVersion
 ```
 
-If two reviewers attempt incompatible updates concurrently:
+```mermaid
+sequenceDiagram
+    participant A as Reviewer A
+    participant B as Reviewer B
+    participant API
+    participant DB as MongoDB
 
-```text
-Request A reads version 4
-Request B reads version 4
+    A->>API: Approve version 4
+    B->>API: Return version 4
 
-Request A updates version 4 → 5
-Request B attempts update using version 4
-↓
-conditional update no longer matches
-↓
-CLAIM_STATE_CONFLICT
+    API->>DB: Update where version = 4
+    DB-->>API: Success, version = 5
+    API-->>A: 200
+
+    API->>DB: Update where version = 4
+    DB-->>API: No match
+    API-->>B: 409 CLAIM_STATE_CONFLICT
 ```
 
-The second request must refetch the latest Claim state.
+The second reviewer must refetch.
 
-This prevents silent lost updates.
+This prevents silent lost updates without introducing distributed locking.
 
-It is optimistic concurrency control, not a distributed lock.
-
-## Review input fingerprint
-
-Submission stores a fingerprint of the policy-relevant input.
-
-Later business/Finance approval verifies that the reviewed input has not silently changed.
-
-If financial/evidence context changes:
-
-```text
-CLAIM_STATE_CONFLICT
-```
-
-The previous approvals are not reused against materially changed input.
+The Claim also stores a review-input fingerprint so approvals cannot silently apply to materially changed financial/evidence input.
 
 ---
 
-# Authorization & Trust Model
+# 17. Authorization and Trust Model
 
-This project uses deliberate **demo impersonation**, not production authentication.
+This assignment uses deliberate **demo impersonation**, not production authentication.
 
-The selected persona is sent as:
+The browser sends:
 
 ```http
 X-Demo-Employee-Code: NX-4471
 ```
 
-The browser does **not** send an authoritative role.
+It does **not** send an authoritative role.
 
-The backend loads Employee data and determines:
+```mermaid
+flowchart LR
+    Browser["Browser selects employee"] --> Header["X-Demo-Employee-Code"]
+    Header --> API["Express"]
+    API --> Employee["Load Employee"]
+    Employee --> Role["Resolve role"]
+    Role --> Hierarchy["Resolve hierarchy / ownership"]
+    Hierarchy --> Decision{"Allowed?"}
+    Decision -- "Yes" --> Resource["Proceed"]
+    Decision -- "No" --> Deny["403"]
+```
 
-- organizational role
-- manager hierarchy
-- exact approver
-- Finance permissions
+The backend determines:
+
+- role
 - claimant ownership
+- exact approver
+- manager hierarchy
+- Finance permissions
+- self-approval restrictions
 
-This means changing a frontend label from:
-
-```text
-Employee
-```
-
-to:
-
-```text
-Finance
-```
-
-would not grant Finance permissions.
-
-## Production replacement
-
-A production system would replace demo identity with an authentication solution such as:
-
-- enterprise SSO
-- OIDC
-- authenticated session
-- JWT-backed identity gateway
-
-The downstream authorization architecture could remain similar.
+A production replacement would use SSO/OIDC/session/JWT identity while preserving similar backend authorization.
 
 ---
 
-# Frontend Architecture
+# 18. Frontend Architecture
 
-The frontend intentionally avoids unnecessary global-state complexity.
+The frontend avoids unnecessary global state.
+
+```mermaid
+flowchart TD
+    A["Application State"] --> B{"Owner"}
+    B -->|"Backend data"| Q["TanStack Query"]
+    B -->|"Demo identity"| C["Small React Context"]
+    B -->|"Form input"| F["React Hook Form + Zod"]
+    B -->|"UI-only state"| L["Local Component State"]
+
+    Q --> Q1["Trips"]
+    Q --> Q2["Evidence"]
+    Q --> Q3["Claims"]
+    Q --> Q4["Approvals"]
+    Q --> Q5["Finance"]
+
+    L --> L1["Drawer"]
+    L --> L2["Modal"]
+    L --> L3["Search / Filter"]
+```
 
 ## React Router
 
-Owns application routes:
+Main routes:
 
 ```text
 /
@@ -1204,65 +1083,9 @@ Owns application routes:
 /finance
 ```
 
-## TanStack Query
+## Actor-scoped query cache
 
-Owns server state:
-
-- trips
-- evidence
-- expenses
-- Claims
-- policy evaluation
-- settlement
-- readiness
-- approval queues
-- Finance queues
-
-## Demo Identity Context
-
-Context stores only the selected demo employee identity.
-
-This is small application-wide state.
-
-Redux is intentionally not used because the application does not have a large client-owned state graph.
-
-## Local component state
-
-UI-only state remains local.
-
-Examples:
-
-- selected row
-- open drawer
-- current modal
-- search text
-- filters
-
-## Forms
-
-Substantive forms use:
-
-```text
-React Hook Form
-+
-Zod
-```
-
-Examples:
-
-- expense exclusion
-- mixed tax resolution
-- return remarks
-- payment scheduling
-- payment reference
-
----
-
-# Actor-Scoped Query Cache
-
-Protected frontend query keys include the selected employee code.
-
-Conceptually:
+Protected query keys include the employee code.
 
 ```text
 actor
@@ -1271,115 +1094,109 @@ actor
   / <claimId>
 ```
 
-This prevents data cached for Chaitanya from being incorrectly reused when another persona is selected.
+This prevents cached data from one persona being reused for another.
 
-After mutations, affected actor-scoped queries are invalidated/refetched.
+## Mutations
 
-Financial state is not optimistically invented on the client.
+Financial/workflow mutations are not automatically retried.
+
+The UI does not optimistically invent:
+
+- statuses
+- settlements
+- approvals
+- Finance state
+
+It refetches authoritative server state.
 
 ---
 
-# API Design
+# 19. API Design
 
-The backend exposes a versioned REST API under:
+Base:
 
 ```text
 /api/v1
 ```
 
-## Operational endpoints
+## Public operational/documentation endpoints
 
 ```http
 GET /health
 GET /ready
-```
-
-## Documentation
-
-```http
 GET /openapi.json
 GET /docs
-```
-
-## Public demo endpoint
-
-```http
 GET /api/v1/demo/users
 ```
 
-## Protected API groups
+## Protected routes
 
-Protected routes require:
+Require:
 
 ```http
 X-Demo-Employee-Code
 ```
 
-Major API groups:
-
 ### Travel Requests
 
-```text
-/api/v1/travel-requests
+```http
+GET /api/v1/travel-requests
+GET /api/v1/travel-requests/:travelRequestId
 ```
 
 ### Evidence
 
-```text
-/api/v1/travel-requests/:id/evidence
-/api/v1/evidence/:id
+```http
+GET /api/v1/travel-requests/:travelRequestId/evidence
+GET /api/v1/evidence/:evidenceId
 ```
 
 ### Expenses
 
-```text
-/api/v1/travel-requests/:id/expenses
+```http
+GET /api/v1/travel-requests/:travelRequestId/expenses
 ```
 
 ### Claims
 
-```text
-/api/v1/claims
-/api/v1/claims/:id
-/api/v1/claims/:id/validation
-/api/v1/claims/:id/readiness
-/api/v1/claims/:id/settlement
+```http
+GET /api/v1/claims
+GET /api/v1/claims/:claimId
+GET /api/v1/claims/:claimId/validation
+GET /api/v1/claims/:claimId/readiness
+GET /api/v1/claims/:claimId/settlement
 ```
 
-### Claim review actions
+### Employee review actions
 
-```text
-exclude
-restore
-resolve
-submit
-resubmit
+```http
+POST /api/v1/claims/:claimId/expenses/:expenseId/exclude
+POST /api/v1/claims/:claimId/expenses/:expenseId/restore
+POST /api/v1/claims/:claimId/expenses/:expenseId/resolve
+POST /api/v1/claims/:claimId/submit
+POST /api/v1/claims/:claimId/resubmit
 ```
 
 ### Approvals
 
-```text
-/api/v1/approvals
-approve
-return
+```http
+GET  /api/v1/approvals
+POST /api/v1/claims/:claimId/approve
+POST /api/v1/claims/:claimId/return
 ```
 
 ### Finance
 
-```text
-/api/v1/finance/claims
-verify
-schedule-payment
-mark-paid
+```http
+GET  /api/v1/finance/claims
+POST /api/v1/claims/:claimId/finance/verify
+POST /api/v1/claims/:claimId/finance/schedule-payment
+POST /api/v1/claims/:claimId/finance/mark-paid
 ```
 
-See Swagger for the authoritative operation schemas.
+## Response convention
 
----
-
-# API Response Convention
-
-Successful single-resource responses generally use:
+Single resource:
 
 ```json
 {
@@ -1387,7 +1204,7 @@ Successful single-resource responses generally use:
 }
 ```
 
-Collections use:
+Collection:
 
 ```json
 {
@@ -1398,7 +1215,7 @@ Collections use:
 }
 ```
 
-Errors use:
+Error:
 
 ```json
 {
@@ -1412,23 +1229,19 @@ Errors use:
 
 ---
 
-# Error Handling
+# 20. Error Handling
 
-The API centralizes error mapping.
+|  HTTP | Meaning                                |
+| ----: | -------------------------------------- |
+| `400` | Invalid request / validation           |
+| `401` | Missing or invalid demo identity       |
+| `403` | Authorization denied                   |
+| `404` | Resource not found                     |
+| `409` | Workflow/concurrent-state conflict     |
+| `422` | Valid request blocked by policy/domain |
+| `500` | Unexpected server error                |
 
-Broad HTTP semantics:
-
-|  HTTP | Meaning                                     |
-| ----: | ------------------------------------------- |
-| `400` | Invalid request / validation                |
-| `401` | Missing or invalid demo identity            |
-| `403` | Authorization denied                        |
-| `404` | Resource not found                          |
-| `409` | Workflow / concurrent-state conflict        |
-| `422` | Valid request blocked by domain/policy rule |
-| `500` | Unexpected server error                     |
-
-Important domain errors include:
+Important domain errors:
 
 ```text
 POLICY_NOT_READY
@@ -1440,99 +1253,42 @@ PAYMENT_REFERENCE_REQUIRED
 ACTION_NOT_ALLOWED
 ```
 
-The frontend presents controlled messages rather than raw stack traces.
+Unexpected database/driver details and credentials are not exposed to clients.
 
 ---
 
-# Engineering Conventions
+# 21. Engineering Conventions
 
-This section defines where new code should live and the standards used throughout the project.
+## Backend
 
-## TypeScript
+Routes remain thin:
 
-- prefer explicit domain types
-- avoid `any`
-- keep HTTP shapes separate from persistence concepts
-- use discriminated unions for stateful commands where appropriate
-- let TypeScript catch invalid state assumptions early
+```text
+parse
+→ resolve identity
+→ authorize
+→ call domain/query logic
+→ serialize
+```
 
-## Backend layering
-
-### Routes should remain thin
-
-Express handlers should primarily:
-
-1. parse request input,
-2. resolve identity,
-3. call query/domain services,
-4. serialize output.
-
-Policy logic does not belong in route handlers.
-
-### Validation
-
-HTTP input is validated using Zod.
-
-### Domain logic
-
-Business rules belong under:
+Policy logic belongs under:
 
 ```text
 server/src/domain/
 ```
 
-Pure calculation should remain independent of Express and React where practical.
+Mongoose documents are serialized into explicit HTTP shapes rather than leaked directly.
 
-### Serialization
+## Frontend
 
-HTTP response shapes are explicitly serialized rather than leaking Mongoose documents directly.
+- TanStack Query owns server state.
+- Context owns only selected demo identity.
+- React Hook Form + Zod own substantive forms.
+- Local UI state stays local.
+- Components format financial values but do not become a second policy engine.
+- Workflow mutations refetch authoritative state.
 
-### Errors
-
-Public error mapping is centralized.
-
-Internal exceptions should not expose credentials or database connection information.
-
----
-
-# Frontend Conventions
-
-### Server state
-
-Use TanStack Query.
-
-Do not manually maintain copies of backend state in Context.
-
-### Identity
-
-Only demo employee identity belongs in the tiny Context.
-
-### Forms
-
-Use React Hook Form + Zod for substantive forms.
-
-### Financial rules
-
-Never reproduce backend policy calculations inside components.
-
-Frontend code may format backend values but must not become a second policy engine.
-
-### Mutations
-
-Do not automatically retry financial/workflow mutations.
-
-Do not optimistically invent:
-
-- statuses
-- settlements
-- approvals
-- Finance state
-
-Refetch the authoritative result.
-
----
-
-# Money Convention
+## Money
 
 Backend:
 
@@ -1546,37 +1302,21 @@ UI:
 formatted INR
 ```
 
-Do not use naïve:
+## Dates
 
-```ts
-Number(value) * 100;
-```
-
-for authoritative financial input conversion.
-
----
-
-# Date Convention
-
-Distinguish:
-
-### Business date
+Business date:
 
 ```text
 YYYY-MM-DD
 ```
 
-### Timestamp
+Timestamp:
 
-Date/time with actual time semantics.
+```text
+date-time
+```
 
-Do not timezone-shift date-only business facts unnecessarily.
-
----
-
-# Styling Convention
-
-The frontend uses:
+## Styling
 
 ```text
 CSS Modules
@@ -1584,64 +1324,50 @@ CSS Modules
 shared design tokens
 ```
 
-New pages should reuse existing:
-
-- spacing
-- typography
-- cards
-- status badges
-- button hierarchy
-- responsive breakpoints
-
-rather than introducing a second design system.
-
----
-
-# Accessibility Convention
-
-Prefer semantic HTML before ARIA.
+## Accessibility
 
 Important interaction requirements include:
 
+- semantic HTML
 - keyboard access
 - labelled controls
 - focus visibility
-- focus restoration
-- native dialog semantics where practical
 - Escape handling
 - status text beyond color alone
 - useful empty/error states
 
----
+## Logging
 
-# Logging
-
-The backend uses Pino / pino-http.
-
-Routine request logging intentionally avoids logging sensitive request:
-
-- headers
-- query values
-- bodies
-
-Logs capture operational request metadata without unnecessarily exposing private content.
+Pino / pino-http records operational request metadata while routine logging avoids sensitive headers, bodies, and query values.
 
 ---
 
-# Local Development Setup
+# 22. Source of Truth
+
+```mermaid
+flowchart TD
+    A["Original Assignment Evidence / Policy"] --> B["docs/canonical-assignment-data.md"]
+    B --> C["Deterministic Seed"]
+    C --> D["MongoDB Domain Records"]
+    D --> E["Backend Policy + Workflow"]
+    E --> F["REST API"]
+    F --> G["Frontend UI"]
+```
+
+The UI is never the authoritative source of financial truth.
+
+---
+
+# 23. Local Development Setup
 
 ## Prerequisites
-
-Install:
 
 - Node.js **22.20+**
 - npm
 - Git
-- MongoDB Atlas account / cluster
+- MongoDB Atlas
 
-For a fresh database seed, you also need the original supplied assignment pack.
-
-Check versions:
+For fresh source-backed seeding, the original assignment pack is also required.
 
 ```bash
 node --version
@@ -1649,35 +1375,27 @@ npm --version
 git --version
 ```
 
----
-
-## 1. Clone the repository
+## Clone
 
 ```bash
 git clone https://github.com/akshaychavan23031998/AI-Planet.git
 cd AI-Planet
 ```
 
----
-
-## 2. Install dependencies
-
-From the repository root:
+## Install
 
 ```bash
 npm install
 ```
 
-The project uses npm workspaces:
+The repository uses npm workspaces:
 
 ```text
 client
 server
 ```
 
----
-
-## 3. Configure the server
+## Backend config
 
 Create:
 
@@ -1685,7 +1403,7 @@ Create:
 server/.env
 ```
 
-using:
+from:
 
 ```text
 server/.env.example
@@ -1697,38 +1415,15 @@ Example:
 NODE_ENV=development
 PORT=3000
 CLIENT_ORIGIN=http://localhost:5173
-
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/
 MONGODB_DB_NAME=ai_planet_expense
 ```
 
 Never commit `server/.env`.
 
----
+## Frontend config
 
-## 4. Configure the client
-
-Local development defaults to:
-
-```text
-http://localhost:3000
-```
-
-for the API.
-
-If you want an explicit client config, create:
-
-```text
-client/.env
-```
-
-from:
-
-```text
-client/.env.example
-```
-
-Example:
+Create `client/.env` only when you want to override the default API origin.
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
@@ -1736,23 +1431,21 @@ VITE_API_BASE_URL=http://localhost:3000
 
 `VITE_*` variables are public browser configuration.
 
-Never put secrets in them.
-
 ---
 
-# Environment Variables
+# 24. Environment Variables
 
 ## Server
 
-| Variable          | Required     | Secret  | Purpose                             |
-| ----------------- | ------------ | ------- | ----------------------------------- |
-| `MONGODB_URI`     | Yes          | **Yes** | MongoDB Atlas connection            |
-| `MONGODB_DB_NAME` | Yes          | No      | Logical DB name                     |
-| `NODE_ENV`        | No           | No      | `development`, `test`, `production` |
-| `PORT`            | Local server | No      | Express local port                  |
-| `CLIENT_ORIGIN`   | Yes          | No      | Exact allowed frontend origin       |
+| Variable          | Required     | Secret  | Purpose                  |
+| ----------------- | ------------ | ------- | ------------------------ |
+| `MONGODB_URI`     | Yes          | **Yes** | MongoDB Atlas connection |
+| `MONGODB_DB_NAME` | Yes          | No      | Logical DB name          |
+| `NODE_ENV`        | No           | No      | Runtime mode             |
+| `PORT`            | Local server | No      | Local Express port       |
+| `CLIENT_ORIGIN`   | Yes          | No      | Exact frontend origin    |
 
-Recommended database name:
+Recommended DB:
 
 ```text
 ai_planet_expense
@@ -1762,17 +1455,22 @@ ai_planet_expense
 
 | Variable            | Required        | Secret | Purpose               |
 | ------------------- | --------------- | ------ | --------------------- |
-| `VITE_API_BASE_URL` | Production: Yes | **No** | Backend public origin |
+| `VITE_API_BASE_URL` | Production: Yes | **No** | Public backend origin |
 
 ---
 
-# Database Seeding
+# 25. Database Seeding and Reset
 
-The seed converts the supplied assignment pack into deterministic MongoDB records.
+```mermaid
+flowchart LR
+    Pack["Assignment Pack"] --> Hash["Validate Inventory + Hashes"]
+    Hash --> Parse["Parse CSV / EML / Receipt Metadata"]
+    Parse --> Canon["Canonical Interpretation"]
+    Canon --> Seed["Deterministic Seed"]
+    Seed --> DB[("MongoDB")]
+```
 
-The pack is **not required during normal application startup after the database has been seeded**.
-
-## PowerShell
+PowerShell:
 
 ```powershell
 $env:ASSIGNMENT_PACK_PATH="<path-to-assignment-pack>"
@@ -1780,7 +1478,7 @@ npm run seed
 Remove-Item Env:ASSIGNMENT_PACK_PATH
 ```
 
-## Expected canonical dataset
+Expected canonical dataset:
 
 ```text
 9 Employees
@@ -1790,30 +1488,18 @@ Remove-Item Env:ASSIGNMENT_PACK_PATH
 1 Claim
 ```
 
-## Seed guarantees
-
 The importer:
 
-- validates the expected source inventory
-- validates pinned source hashes
-- parses employee CSV data
+- validates source inventory
+- validates pinned hashes
+- parses employee CSV
 - parses email metadata/content
 - uses canonical receipt metadata
 - creates deterministic records
 - reuses seeded identities
-- restores canonical seeded source state when rerun
+- restores canonical seeded source/default claim state when rerun
 
-The source hashes prevent accidental modification of assignment truth from silently changing the demo dataset.
-
----
-
-# Canonical Reset
-
-Workflow actions intentionally mutate the seeded Claim.
-
-To restore the deterministic demo scenario, rerun the assignment seed using the original validated source pack.
-
-The canonical Claim begins as:
+Canonical Claim start:
 
 ```text
 DRAFT
@@ -1824,21 +1510,17 @@ no Finance state
 no employee review decisions
 ```
 
-This is useful before recording a fresh demonstration.
-
 ---
 
-# Running the Application
+# 26. Running the Application
 
-## Start frontend and backend together
-
-From the repository root:
+Run both:
 
 ```bash
 npm run dev
 ```
 
-Default URLs:
+Local URLs:
 
 | Service   | URL                                  |
 | --------- | ------------------------------------ |
@@ -1849,37 +1531,26 @@ Default URLs:
 | Health    | `http://localhost:3000/health`       |
 | Readiness | `http://localhost:3000/ready`        |
 
----
-
-## Start separately
-
-Backend:
+Run separately:
 
 ```bash
 npm run dev:server
-```
-
-Frontend:
-
-```bash
 npm run dev:client
 ```
 
----
-
-## Production-style local build
+Production-style build:
 
 ```bash
 npm run build
 ```
 
-Run compiled backend:
+Compiled backend:
 
 ```bash
 npm run start --workspace server
 ```
 
-Preview frontend build:
+Frontend preview:
 
 ```bash
 npm run preview --workspace client
@@ -1887,73 +1558,41 @@ npm run preview --workspace client
 
 ---
 
-# Swagger / OpenAPI
+# 27. Swagger and OpenAPI
 
-Local Swagger UI:
+Production Swagger:
+
+[https://ai-planet-server.vercel.app/docs/](https://ai-planet-server.vercel.app/docs/)
+
+Production OpenAPI:
+
+[https://ai-planet-server.vercel.app/openapi.json](https://ai-planet-server.vercel.app/openapi.json)
+
+Local Swagger:
 
 ```text
 http://localhost:3000/docs
 ```
 
-OpenAPI JSON:
-
-```text
-http://localhost:3000/openapi.json
-```
-
-Swagger documents:
-
-- health
-- readiness
-- demo identities
-- trips
-- evidence
-- expenses
-- Claims
-- policy validation
-- settlement
-- readiness
-- approvals
-- Finance
-
 ## Swagger authorization
 
-Click:
-
-```text
-Authorize
-```
-
-and enter:
+Click **Authorize** and enter, for example:
 
 ```text
 NX-4471
 ```
 
-Swagger then sends:
+Swagger sends:
 
 ```http
 X-Demo-Employee-Code: NX-4471
 ```
 
-Changing the employee code simulates another demo actor.
+Production Swagger uses pinned browser assets while continuing to consume the same application-owned `/openapi.json` contract.
 
 ---
 
-# Example API Request
-
-```http
-GET /api/v1/claims
-X-Demo-Employee-Code: NX-4471
-```
-
-For the full contract, use Swagger rather than duplicating schemas in this README.
-
----
-
-# Demo Personas
-
-The seeded employee hierarchy includes:
+# 28. Demo Personas
 
 | Employee Code | Person          | Demo role                          |
 | ------------- | --------------- | ---------------------------------- |
@@ -1963,214 +1602,62 @@ The seeded employee hierarchy includes:
 | `NX-1002`     | Arvind Rao      | Head of Division                   |
 | `NX-1000`     | Nandita Shah    | Managing Director                  |
 | `NX-3305`     | Ravi Menon      | Finance                            |
-| `NX-3300`     | Kavitha Balan   | Finance Controller                 |
+| `NX-3300`     | Kavitha Balan   | Finance                            |
 | `NX-5182`     | Deepa Nair      | Unrelated employee / receipt owner |
 | `NX-4490`     | Imran Qureshi   | Employee with no supplied trip     |
 
-Important:
-
-A persona without a TravelRequest should not receive fake Trip / Evidence / Claim IDs.
-
-For example, Imran can use global workspace routes but has no seeded trip to open.
+A persona without a seeded TravelRequest does not receive fake trip, evidence, or claim IDs.
 
 ---
 
-# Recommended Demo Walkthrough
+# 29. Recommended Demo Walkthrough
 
-Start with a fresh seeded Claim.
-
-## 1. Employee
-
-Select:
-
-```text
-Chaitanya Reddy — NX-4471
+```mermaid
+flowchart LR
+    A["Chaitanya"] --> B["Trip"]
+    B --> C["Evidence"]
+    C --> D["Claim"]
+    D --> E["Resolve Blockers"]
+    E --> F["Submit"]
+    F --> G["Assigned Approver"]
+    G --> H["Business Approval"]
+    H --> I["Finance"]
+    I --> J["Verify"]
+    J --> K["Schedule / Pay if Payable"]
 ```
 
-Explore:
-
-```text
-Overview
-Trip request
-Evidence inbox
-Claim review
-```
-
-Inspect:
-
-- trip facts
-- historical RM approval
-- missing HOD evidence
-- flights
-- hotel
-- Uber receipts
-- failed payment
-- duplicate receipt
-- colleague receipt
-- dinner
-- settlement
-- readiness
-
-## 2. Resolve the employee Claim
-
-The initial Claim is intentionally not ready.
-
-Demonstrate controlled decisions such as:
-
-- excluding the unsupported business dinner if desired
-- explicitly resolving mixed hotel tax with a defensible manual allocation
-
-Do not fabricate missing evidence.
-
-## 3. Submit
-
-Once backend readiness becomes true:
-
-```text
-Submit claim
-```
-
-The backend selects the required review route.
-
-## 4. Approvals
-
-Switch to the exact assigned approver.
-
-For example:
-
-```text
-Suresh Iyer
-```
-
-Open:
-
-```text
-Approvals
-```
-
-Approve or return based on the demonstration.
-
-Continue through any additional required business-review stages.
-
-## 5. Finance
-
-Switch to an authorized Finance persona.
-
-Open:
-
-```text
-Finance
-```
-
-Demonstrate:
-
-- verification
-- settlement
-- payment scheduling if payable
-- payment completion when allowed
-
-## 6. Reset
-
-After a destructive workflow demonstration, rerun the deterministic seed to return the scenario to its canonical initial state.
+1. Select **Chaitanya Reddy — NX-4471**.
+2. Open Overview, Trip, Evidence, and Claim.
+3. Inspect the failed payment, duplicate receipt, colleague receipt, company-paid flights, hotel components, dinner, settlement, and readiness.
+4. Resolve supported ambiguity or exclude unsupported items without fabricating evidence.
+5. Submit once backend readiness becomes true.
+6. Switch to the exact assigned approver, beginning with **Suresh Iyer** when Manager review is required.
+7. Continue through any further business approval stages.
+8. Switch to Ravi or Kavitha for Finance.
+9. Verify, schedule payment if payable, and mark paid only when valid.
+10. Rerun the deterministic seed after destructive demos if the canonical state must be restored.
 
 ---
 
-# Testing Strategy
+# 30. Testing Strategy
 
-Testing is layered by responsibility.
-
-## Policy unit tests
-
-Validate:
-
-- financial arithmetic
-- eligibility
-- disallowances
-- duplicates
-- approval requirements
-- settlement
-- readiness
-
-These tests do not need MongoDB.
-
-## Workflow tests
-
-Validate:
-
-- submission
-- approval stages
-- returns
-- resubmission
-- Finance verification
-- payment scheduling
-- authorization
-- race protection
-
-## API integration tests
-
-Supertest validates:
-
-- middleware
-- routes
-- status codes
-- request validation
-- authorization
-- response contracts
-- errors
-
-Mongo query boundaries are isolated for testability.
-
-## OpenAPI contract tests
-
-Validate:
-
-- OpenAPI structure
-- documented operations
-- schema/reference integrity
-- Swagger endpoints
-
-## Frontend tests
-
-Vitest + Testing Library validate:
-
-- typed API calls
-- identity behavior
-- actor cache isolation
-- Dashboard
-- Trip
-- Evidence
-- Claim
-- policy findings
-- settlement
-- manual resolution
-- submit/resubmit
-- Approvals
-- Finance
-- dialogs
-- error behavior
-- keyboard interaction
-
-## Seed tests
-
-Source-backed tests validate the supplied assignment pack without writing to MongoDB.
-
----
-
-# Test Commands
-
-Run all regular tests:
-
-```bash
-npm test
+```mermaid
+flowchart TD
+    P["Policy Tests"] --> C["Confidence"]
+    W["Workflow Tests"] --> C
+    A["API Integration Tests"] --> C
+    O["OpenAPI Contract Tests"] --> C
+    F["Frontend Tests"] --> C
+    S["Seed Tests"] --> C
 ```
 
-Current regular baseline:
+## Current regular baseline
 
 ```text
 332 passing tests
 ```
 
-Current suite distribution:
+Suite distribution:
 
 ```text
 57  policy
@@ -2180,9 +1667,16 @@ Current suite distribution:
 164 client
 ```
 
-Run individual suites:
+Source-backed seed suite:
+
+```text
+3 passing tests
+```
+
+Commands:
 
 ```bash
+npm test
 npm run test:policy
 npm run test:workflow
 npm run test:api
@@ -2190,7 +1684,7 @@ npm run test:openapi
 npm run test:client
 ```
 
-Run source-pack seed validation:
+Seed validation:
 
 ```powershell
 $env:ASSIGNMENT_PACK_PATH="<path-to-assignment-pack>"
@@ -2198,17 +1692,7 @@ npm run test:seed
 Remove-Item Env:ASSIGNMENT_PACK_PATH
 ```
 
-Current seed suite:
-
-```text
-3 passing tests
-```
-
----
-
-# Code Quality Commands
-
-Before committing:
+Quality gate:
 
 ```bash
 npm run lint
@@ -2216,33 +1700,22 @@ npm run typecheck
 npm run build
 npm run format:check
 npm test
-```
-
-Then run:
-
-```bash
 git diff --check
 ```
 
 ---
 
-# Deployment Architecture
-
-The repository is designed for:
-
-```text
-One GitHub repository
-+
-Two Vercel projects
-+
-MongoDB Atlas
-```
+# 31. Deployment Architecture
 
 ```mermaid
 flowchart LR
-    GitHub["GitHub<br/>AI-Planet"]
-    Client["Vercel Frontend<br/>Root: client"]
-    Server["Vercel Backend<br/>Root: server"]
+    GitHub["GitHub Repository"]
+
+    subgraph Vercel["Vercel"]
+        Client["ai-planet-client\nRoot: client"]
+        Server["ai-planet-server\nRoot: server"]
+    end
+
     Atlas[("MongoDB Atlas")]
 
     GitHub --> Client
@@ -2251,178 +1724,101 @@ flowchart LR
     Server --> Atlas
 ```
 
+Production URLs:
+
+| Service   | URL                                                                                                  |
+| --------- | ---------------------------------------------------------------------------------------------------- |
+| Frontend  | [https://ai-planet-client.vercel.app/](https://ai-planet-client.vercel.app/)                         |
+| Readiness | [https://ai-planet-server.vercel.app/ready](https://ai-planet-server.vercel.app/ready)               |
+| Swagger   | [https://ai-planet-server.vercel.app/docs/](https://ai-planet-server.vercel.app/docs/)               |
+| OpenAPI   | [https://ai-planet-server.vercel.app/openapi.json](https://ai-planet-server.vercel.app/openapi.json) |
+
 ---
 
-# Deploying to Vercel
+# 32. Production Deployment Notes
 
-Production deployment uses the same repository twice.
-
-## Project 1 — Frontend
-
-Import:
+## Frontend Vercel project
 
 ```text
-https://github.com/akshaychavan23031998/AI-Planet
-```
-
-Set:
-
-```text
+Project: ai-planet-client
 Root Directory: client
 Framework: Vite
+Install Command: cd .. && npm install
 Build Command: npm run build
 Output Directory: dist
 ```
 
-Environment:
+Production env:
 
 ```env
-VITE_API_BASE_URL=https://<backend-vercel-domain>
+VITE_API_BASE_URL=https://ai-planet-server.vercel.app
 ```
 
-The frontend includes a Vercel SPA rewrite configuration so direct navigation to React Router routes resolves to `index.html`.
+The frontend includes an SPA rewrite so nested React Router routes survive direct refresh.
 
-Examples:
-
-```text
-/claims/<id>
-/approvals
-/finance
-```
-
-must continue working after refresh.
-
----
-
-# Project 2 — Backend
-
-Import the **same GitHub repository** again.
-
-Set:
+## Backend Vercel project
 
 ```text
+Project: ai-planet-server
 Root Directory: server
-Framework: Express / Node.js
+Framework: Express
+Install Command: cd .. && npm install --include=dev
+Build Command: npm run build
 ```
 
-The backend is deployed as an Express application on Vercel.
-
-Production environment variables:
+Production env:
 
 ```env
 NODE_ENV=production
-CLIENT_ORIGIN=https://<frontend-vercel-domain>
-
-MONGODB_URI=<production-atlas-uri>
+CLIENT_ORIGIN=https://ai-planet-client.vercel.app
+MONGODB_URI=<atlas-connection-string>
 MONGODB_DB_NAME=ai_planet_expense
 ```
 
-Do not expose `MONGODB_URI` to the frontend project.
+The Express application is exported for Vercel's runtime.
 
-The backend must continue to expose:
+Local development continues to use the normal server listener startup path.
 
-```text
-/health
-/ready
-/docs
-/openapi.json
-/api/v1/*
+## Frontend/backend environment handshake
+
+```mermaid
+sequenceDiagram
+    participant Client as Frontend
+    participant Server as Backend
+    participant Atlas as MongoDB Atlas
+
+    Note over Client: VITE_API_BASE_URL = backend origin
+    Note over Server: CLIENT_ORIGIN = frontend origin
+    Client->>Server: Browser API request
+    Server->>Server: Exact-origin CORS
+    Server->>Atlas: Connect / reuse connection
+    Atlas-->>Server: Data
+    Server-->>Client: JSON
 ```
 
----
+## Atlas network access
 
-# Deployment Environment Handshake
+For this take-home deployment, Atlas must allow the Vercel backend's outbound traffic.
 
-The frontend needs the backend URL:
+If `0.0.0.0/0` is used for the demo, compensate with:
 
-```text
-VITE_API_BASE_URL
-```
-
-The backend needs the frontend URL:
-
-```text
-CLIENT_ORIGIN
-```
-
-A practical deployment sequence is:
-
-```text
-1. Create frontend Vercel project.
-2. Obtain frontend domain.
-
-3. Create backend Vercel project.
-4. Set CLIENT_ORIGIN to frontend domain.
-5. Configure MongoDB Atlas environment variables.
-6. Deploy backend.
-7. Obtain backend domain.
-
-8. Set frontend VITE_API_BASE_URL to backend domain.
-9. Redeploy frontend.
-
-10. Production smoke test.
-```
-
-The production URLs will be added to the Project Links section after successful deployment.
-
----
-
-# MongoDB Atlas Deployment Notes
-
-The backend is the only application that connects to MongoDB Atlas.
-
-## Database user
-
-Prefer a dedicated application user with only the permissions required by this application.
-
-Recommended scope:
-
-```text
-readWrite
-on
-ai_planet_expense
-```
-
-Do not use an Atlas administrative account as the application runtime credential.
-
-## Network access
-
-Vercel serverless / Fluid Compute infrastructure may use dynamic outbound addresses depending on the selected networking plan.
-
-For a take-home/demo environment, Atlas may need network access broad enough for the Vercel backend to connect.
-
-If using:
-
-```text
-0.0.0.0/0
-```
-
-treat it as a demo-network tradeoff and compensate with:
-
-- strong unique credentials
+- strong credentials
 - least-privilege database user
-- secret storage in Vercel only
+- secrets stored only in backend deployment settings
 
-A production enterprise environment should prefer stronger network controls such as:
-
-- restricted egress
-- static outbound IPs
-- private connectivity
-- network peering / private endpoint options where available
+A real enterprise deployment should prefer stronger network controls.
 
 ---
 
-# Production Smoke Test
+# 33. Production Smoke Test
 
-After deployment verify:
-
-## Backend
+Backend:
 
 ```text
 GET /health
 GET /ready
 GET /openapi.json
-GET /docs
+GET /docs/
 GET /api/v1/demo/users
 ```
 
@@ -2430,12 +1826,11 @@ Expected:
 
 ```text
 /health → 200
-/ready  → 200 with database connected
+/ready  → 200, database connected
+/demo/users → 9 users
 ```
 
-## Frontend
-
-Verify direct navigation and refresh for:
+Frontend:
 
 ```text
 /
@@ -2446,9 +1841,9 @@ Verify direct navigation and refresh for:
 /finance
 ```
 
-## Persona switching
+Verify direct navigation and refresh.
 
-Verify:
+Verify persona switching:
 
 ```text
 Chaitanya
@@ -2458,185 +1853,186 @@ Chaitanya
 → Imran
 ```
 
-does not leak prior persona state.
-
-## Workflow
-
-Only perform production mutations when intentionally testing the demo database.
-
-Reset the canonical Claim afterward if required.
+does not leak cached protected state.
 
 ---
 
-# Security Considerations
+# 34. Security Considerations
 
-## Server-side secrets
+## Secrets
 
-Secrets belong only in:
+Secrets belong only in backend environment configuration.
 
-```text
-server/.env
-```
-
-or backend deployment environment variables.
-
-Never place secrets in:
+Never put secrets in:
 
 ```text
 VITE_*
 ```
 
-because Vite variables are visible to the browser.
-
 ## CORS
 
-The backend uses the configured exact frontend origin.
+Production uses the exact frontend origin:
 
-Production should configure:
-
-```text
-CLIENT_ORIGIN=https://<frontend-domain>
+```env
+CLIENT_ORIGIN=https://ai-planet-client.vercel.app
 ```
 
-Do not use wildcard CORS as a deployment shortcut.
+Wildcard CORS is intentionally avoided.
 
 ## Authorization
 
-Frontend controls are not security boundaries.
-
-The backend independently checks:
+The backend independently verifies:
 
 - claimant
+- role
 - exact approver
 - hierarchy
-- Finance role
-- self-approval
+- Finance access
+- self-approval restrictions
 - workflow state
-
-## Source integrity
-
-Claim actions do not modify original Evidence/Expense data.
 
 ## Financial integrity
 
-Policy, settlement and workflow decisions are backend-authoritative.
+Policy, settlement, routing, and payment eligibility are backend-authoritative.
+
+## Source integrity
+
+Claim actions do not modify original Evidence/Expense meaning.
 
 ## Concurrency
 
-Claim state/version guards protect against stale simultaneous workflow writes.
+Conditional writes protect against stale simultaneous updates.
+
+## Logging
+
+Internal database connection information is not returned to clients.
 
 ---
 
-# Assumptions & Limitations
+# 35. Assumptions and Limitations
 
-This project intentionally focuses on the core reimbursement workflow.
-
-Current limitations include:
-
-### Demo identity instead of production authentication
-
-There is no real SSO/login system.
-
-`X-Demo-Employee-Code` exists only to demonstrate authorization and personas.
-
-### Single canonical scenario
-
-The assignment seed focuses on one complete travel-expense scenario.
-
-The architecture supports multiple documents, but the supplied scenario is the primary demo dataset.
-
-### No runtime OCR
-
-Receipt facts are supplied/pre-extracted deterministically.
-
-The application does not perform live OCR.
-
-### Receipt binary serving
-
-Receipt image evidence is represented through metadata/reference relationships.
-
-The backend does not currently serve receipt binaries to the browser.
-
-### No mailbox integration
-
-There is no Gmail or Outlook connector.
-
-The supplied `.eml` evidence is imported deterministically.
-
-### No real payment execution
-
-Finance payment actions record workflow metadata.
-
-There is no payroll or bank integration.
-
-### No notifications
-
-Email/Slack notifications are outside the current scope.
-
-### No multi-currency settlement
-
-The canonical workflow uses INR.
-
-### No production identity provider
-
-A real deployment would integrate corporate identity infrastructure.
+- Demo identity is not production authentication.
+- The supplied assignment scenario is the primary canonical dataset.
+- There is no live OCR.
+- There is no Gmail/Outlook integration.
+- There is no real bank/payroll integration.
+- Receipt evidence is modeled through source metadata/relationships rather than a general file-storage platform.
+- There are no notifications.
+- The canonical settlement is INR-focused.
+- Submission-within-7-days compliance cannot be concluded because the authoritative submission date is missing.
+- Advance-cap compliance cannot be concluded because the authoritative estimated employee-paid/company-paid split is missing.
+- The application intentionally leaves those facts unknown rather than inventing conclusions.
 
 ---
 
-# AI / LLM Decision
+# 36. AI / LLM Decision
 
-The application deliberately does **not** use OpenAI, Gemini or another LLM to make authoritative financial decisions.
+The application deliberately does **not** use an LLM for authoritative financial decisions.
 
-These areas remain deterministic:
+These remain deterministic:
 
 ```text
 Policy
 Eligibility
 Disallowances
 Settlement
-Approval routing
-Workflow transitions
+Approval Routing
+Workflow Transitions
 Authorization
-Payment eligibility
+Payment Eligibility
 ```
 
-This prevents probabilistic output from deciding employee financial outcomes.
+```mermaid
+flowchart LR
+    A["Probabilistic AI Output"] --> B{"Authoritative money decision?"}
+    B -- "Yes" --> C["Do not use AI"]
+    B -- "No" --> D["Potential advisory use"]
+    D --> E["Summaries"]
+    D --> F["Policy explanations"]
+    D --> G["Category suggestions"]
+    D --> H["Missing-info hints"]
+    D --> I["Duplicate candidates"]
+```
 
-A future AI layer could be useful for advisory tasks such as:
-
-- evidence summarization
-- plain-English policy explanation
-- category suggestions
-- missing-information hints
-- duplicate candidates
-
-but such output should remain non-authoritative and subject to deterministic validation.
+AI could be added later for advisory assistance, but deterministic validation should remain the final authority.
 
 ---
 
-# Source of Truth
+# 37. Engineering Decision Summary
 
-The project follows this precedence:
+| Decision                          | Reason                                                    |
+| --------------------------------- | --------------------------------------------------------- |
+| Monorepo `client` + `server`      | Simple development with independent deployments           |
+| React SPA                         | Appropriate for internal workflow UI                      |
+| Express REST API                  | Clear HTTP/domain boundary                                |
+| MongoDB + Mongoose                | Flexible document-oriented workflow persistence           |
+| Five major persisted domain areas | Keeps model aligned to business concepts                  |
+| Approvals + Finance inside Claim  | They belong to Claim lifecycle                            |
+| Integer paise                     | Financial precision                                       |
+| `YYYY-MM-DD` business dates       | Avoid date-only timezone bugs                             |
+| Deterministic policy engine       | Predictable financial decisions                           |
+| Immutable source meaning          | Auditability                                              |
+| Claim-local review decisions      | Preserve source truth                                     |
+| Demo employee header              | Demonstrate personas without pretending to have real auth |
+| Backend role resolution           | Browser cannot grant privileges                           |
+| Conditional writes                | Race-condition protection                                 |
+| Workflow version                  | Detect stale updates                                      |
+| Actor-scoped query keys           | Prevent persona cache leakage                             |
+| TanStack Query                    | Server-state ownership/invalidation                       |
+| RHF + Zod                         | Consistent forms                                          |
+| Explicit serializers              | Prevent persistence internals leaking                     |
+| Centralized errors                | Safe, consistent API failures                             |
+| OpenAPI + Swagger                 | Discoverable/testable API contract                        |
+| Exact-origin CORS                 | Avoid wildcard production access                          |
+| No runtime LLM decisions          | Financial determinism                                     |
+| Two Vercel projects               | Independent frontend/backend deployment                   |
+| Deterministic seed                | Repeatable demo and testing                               |
+
+## Where should new code live?
+
+```mermaid
+flowchart TD
+    A["New Requirement"] --> B{"Financial / policy?"}
+    B -- "Yes" --> P["server/src/domain/policy"]
+    B -- "No" --> C{"Workflow / approval / Finance?"}
+    C -- "Yes" --> W["server/src/domain/claims"]
+    C -- "No" --> D{"Persistence?"}
+    D -- "Yes" --> M["server/src/modules"]
+    D -- "No" --> E{"HTTP boundary?"}
+    E -- "Yes" --> API["server/src/api/v1"]
+    E -- "No" --> F{"API documentation?"}
+    F -- "Yes" --> O["server/src/openapi"]
+    F -- "No" --> G{"Server state in UI?"}
+    G -- "Yes" --> Q["client/src/api + client/src/app"]
+    G -- "No" --> U["client/src/components + pages"]
+```
+
+---
+
+# 38. How to Extend the Project
+
+Typical feature sequence:
 
 ```text
-Original assignment evidence / policy
-        ↓
-docs/canonical-assignment-data.md
-        ↓
-deterministic seed
-        ↓
-backend domain rules
-        ↓
-REST API
-        ↓
-frontend UI
+1. Define/extend domain behavior.
+2. Add domain tests.
+3. Add persistence changes if required.
+4. Add Zod validation.
+5. Add/extend API route.
+6. Add serializer.
+7. Update OpenAPI contract/tests.
+8. Add typed frontend API call.
+9. Add actor-scoped TanStack Query hook.
+10. Add UI.
+11. Add frontend tests.
+12. Run full regression.
 ```
 
-The UI is never the authoritative source of financial truth.
+This keeps business rules out of controllers and UI components.
 
 ---
 
-# Troubleshooting
+# 39. Troubleshooting
 
 ## `/ready` returns 503
 
@@ -2649,57 +2045,45 @@ Atlas Network Access
 Atlas database-user credentials
 ```
 
-`/health` may still return 200 because HTTP liveness and database readiness are separate.
-
----
+`/health` can still return 200 because liveness and readiness are intentionally separate.
 
 ## Browser shows CORS error
 
-Verify backend:
+Local:
 
 ```env
 CLIENT_ORIGIN=http://localhost:5173
 ```
 
-for local development.
-
-For production:
+Production:
 
 ```env
-CLIENT_ORIGIN=https://<frontend-domain>
+CLIENT_ORIGIN=https://ai-planet-client.vercel.app
 ```
-
-The value should be an origin, not a URL path.
-
----
 
 ## Frontend cannot reach API
 
-Check:
+Local:
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-locally.
+Production:
 
-Production must use the deployed backend origin.
-
----
-
-## Trip / Evidence / Claim links are unavailable for a persona
-
-That employee may not have a seeded TravelRequest.
-
-This is expected for personas such as:
-
-```text
-Imran Qureshi
+```env
+VITE_API_BASE_URL=https://ai-planet-server.vercel.app
 ```
 
-The application does not invent IDs or reuse another employee's trip.
+Vite env values are build-time, so redeploy after changing production values.
 
----
+## Persona has no Trip / Evidence / Claim
+
+That employee may have no seeded TravelRequest.
+
+For example, Imran intentionally has no supplied trip.
+
+The system does not invent IDs.
 
 ## Claim cannot be submitted
 
@@ -2711,119 +2095,73 @@ Submission Readiness
 Unresolved Amounts
 ```
 
-The backend may intentionally return:
+The backend may return:
 
 ```text
 POLICY_NOT_READY
 ```
 
-until blocking ambiguity is resolved or excluded appropriately.
+until blockers are resolved or excluded.
 
----
-
-## Workflow action reports conflict
-
-A:
+## Workflow conflict
 
 ```text
 CLAIM_STATE_CONFLICT
 ```
 
-means the Claim changed after the current screen's state was loaded.
+means the Claim changed after the screen loaded.
 
-Refetch and review the latest state before trying again.
-
----
-
-# How to Extend the Project
-
-A typical new backend feature should follow this sequence:
-
-```text
-1. Define/extend domain behavior.
-2. Add domain tests.
-3. Add persistence changes if required.
-4. Add Zod API validation.
-5. Add/extend API route.
-6. Add serializer.
-7. Update OpenAPI contract/tests.
-8. Add typed frontend API function.
-9. Add actor-scoped TanStack Query hook.
-10. Add UI.
-11. Add frontend tests.
-12. Run full regression.
-```
-
-This keeps business rules out of controllers and UI components.
+Refetch before retrying.
 
 ---
 
-# Design Decisions Summary
+# 40. Future Production Enhancements
 
-| Decision                          | Reason                                          |
-| --------------------------------- | ----------------------------------------------- |
-| Monorepo with `client` + `server` | Simple development and independent deployments  |
-| React SPA                         | Appropriate for internal workflow UI            |
-| Express REST API                  | Clear HTTP/domain separation                    |
-| MongoDB + Mongoose                | Flexible document-oriented workflow persistence |
-| Integer paise                     | Financial precision                             |
-| YYYY-MM-DD business dates         | Avoid date-only timezone bugs                   |
-| Deterministic policy engine       | Financial predictability                        |
-| Evidence/Expense immutability     | Auditability                                    |
-| Claim-local decisions             | Preserve source truth                           |
-| Demo identity header              | Demonstrate personas without fake auth          |
-| Backend authorization             | Browser role cannot grant privileges            |
-| Conditional workflow writes       | Race-condition protection                       |
-| TanStack Query                    | Server-state ownership/cache invalidation       |
-| Actor-scoped query keys           | Persona data isolation                          |
-| RHF + Zod                         | Consistent substantive form handling            |
-| CSS Modules + tokens              | Scoped, maintainable styling                    |
-| OpenAPI + Swagger                 | Discoverable/testable API contract              |
-| No runtime LLM decisions          | Financial determinism and safety                |
-
----
-
-# Future Production Enhancements
-
-Potential extensions include:
+Potential extensions:
 
 - enterprise SSO / OIDC
-- corporate Gmail / Outlook ingestion
-- receipt file storage
-- OCR/document extraction
+- Gmail / Outlook ingestion
+- receipt binary storage
+- OCR / document extraction
 - background ingestion workers
-- notification service
-- payroll/payment integration
-- recovery workflow for employee-payable balances
-- multi-currency support
-- broader reporting
+- notifications
+- payroll / payment integration
+- recovery workflow
+- multi-currency settlement
+- reporting
 - audit exports
 - observability dashboards
 - role administration
+- stronger private networking/static egress
 - optional non-authoritative AI assistance
 
-These should be added only when required rather than preemptively complicating the current architecture.
+These should be added only when requirements justify the extra complexity.
 
 ---
 
-# Author
+# 41. Author
 
 ## Akshay Chavan
 
-Full-stack software engineer focused on building scalable web applications, backend systems and production-oriented product experiences.
+Full-stack software engineer focused on scalable web applications, backend systems, APIs, and production-oriented product experiences.
 
-- **Portfolio:** [https://akshay-chavan-portfolio.vercel.app/](https://akshay-chavan-portfolio.vercel.app/)
-- **GitHub:** [https://github.com/akshaychavan23031998](https://github.com/akshaychavan23031998)
-- **Project Repository:** [https://github.com/akshaychavan23031998/AI-Planet](https://github.com/akshaychavan23031998/AI-Planet)
+| Resource               | Link                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Portfolio**          | [https://akshay-chavan-portfolio.vercel.app/](https://akshay-chavan-portfolio.vercel.app/)             |
+| **GitHub**             | [https://github.com/akshaychavan23031998](https://github.com/akshaychavan23031998)                     |
+| **Project Repository** | [https://github.com/akshaychavan23031998/AI-Planet](https://github.com/akshaychavan23031998/AI-Planet) |
+| **Live Project**       | [https://ai-planet-client.vercel.app/](https://ai-planet-client.vercel.app/)                           |
+
+For more about my work, projects, professional experience, contact details, or to download my latest resume, visit my **[portfolio](https://akshay-chavan-portfolio.vercel.app/)**.
 
 ---
 
-## Deployment Status
+## Final Project Links
 
-Frontend and backend production URLs will be added here after the final Vercel deployment and production smoke test.
+- **Live App:** [https://ai-planet-client.vercel.app/](https://ai-planet-client.vercel.app/)
+- **GitHub Repo:** [https://github.com/akshaychavan23031998/AI-Planet](https://github.com/akshaychavan23031998/AI-Planet)
+- **API Readiness:** [https://ai-planet-server.vercel.app/ready](https://ai-planet-server.vercel.app/ready)
+- **Swagger Docs:** [https://ai-planet-server.vercel.app/docs/](https://ai-planet-server.vercel.app/docs/)
+- **Portfolio:** [https://akshay-chavan-portfolio.vercel.app/](https://akshay-chavan-portfolio.vercel.app/)
 
-```text
-Live App:     Pending deployment
-Swagger API:  Pending deployment
-Backend API:  Pending deployment
-```
+> Built as an engineering take-home focused on correctness, traceability, financial determinism, workflow safety, and production-minded full-stack design.
