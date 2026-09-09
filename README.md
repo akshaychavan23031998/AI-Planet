@@ -107,7 +107,7 @@ Run `npm run test:openapi` for offline specification/reference validation, route
 
 ## React foundation
 
-The client now provides the approved Nortex shell, React Router, TanStack Query, a native-fetch API client, a small demo identity Context, Lucide icons and one Sonner toast root. CSS Modules use shared tokens based on the external approved prototype. The Dashboard now loads actor-visible trips, estimates, advances, evidence counts and claim-status links from the backend. Trip and Evidence pages expose source facts; Claim review now supports employee decisions and submission; Approvals and Finance pages remain structural placeholders.
+The client now provides the approved Nortex shell, React Router, TanStack Query, a native-fetch API client, a small demo identity Context, Lucide icons and one Sonner toast root. CSS Modules use shared tokens based on the external approved prototype. The Dashboard now loads actor-visible trips, estimates, advances, evidence counts and claim-status links from the backend. Trip and Evidence pages expose source facts; Claim review now supports employee decisions and submission; Approvals and Finance pages provide assigned review queues and server-backed decisions.
 
 Routes: `/`, `/trips/:travelRequestId`, `/trips/:travelRequestId/evidence`, `/claims/:claimId`, `/approvals`, `/finance` and a not-found fallback. Route identifiers are Mongo document IDs, not business Travel Request IDs. Trip/evidence/claim sidebar entries use the current route or recent API records; no seed ID is invented. Approval and Finance navigation is visible for demo exploration; backend authorization remains authoritative.
 
@@ -131,6 +131,12 @@ Evidence includes every returned classification, including duplicates, failed pa
 
 Only the claimant can edit `DRAFT` and `RETURNED` claims. Exclude requires a reason; restore preserves audit history; mixed hotel tax resolution requires an explicit allocation and reason, with no assumed canonical split. React Hook Form, Zod and the Zod resolver validate form input, including exact decimal-to-paise conversion. These decisions never modify source Expense or Evidence records.
 
-Submit and resubmit call the existing workflow endpoints without supplying a next status, approver or review cycle. `SUBMITTED` is a history event, not a persistent Claim status. Mutations do not retry or optimistically change financial values; affected actor-scoped Claim queries refetch before updated figures are shown. Conflicts and policy-not-ready responses refresh the current review state. Approval and Finance action UIs are not implemented yet.
+Submit and resubmit call the existing workflow endpoints without supplying a next status, approver or review cycle. `SUBMITTED` is a history event, not a persistent Claim status. Mutations do not retry or optimistically change financial values; affected actor-scoped Claim queries refetch before updated figures are shown. Conflicts and policy-not-ready responses refresh the current review state.
 
 Frontend mutation tests use mocked HTTP responses. Do not use canonical Atlas claims for mutation smoke tests.
+
+### Approval and Finance workspaces
+
+`/approvals` shows the selected demo identity's assigned business reviews. Review policy findings, settlement and evidence before approving or returning with remarks. `/finance` uses the authorized Finance queue for verification, payment scheduling and completion references. Current-cycle verification is read from server metadata; it can leave a claim in `FINANCE_REVIEW`. Final recoverable and zero balances have no reimbursement payment action.
+
+All mutations use the existing API and refresh actor-scoped queues and claim context. Payment dates and workflow authorization remain server-controlled. Payment completion records demo metadata only; there is no bank or payment-provider integration. Frontend action tests mock HTTP; live smoke checks only read the canonical scenario.

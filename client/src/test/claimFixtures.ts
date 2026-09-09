@@ -21,6 +21,7 @@ export const initialClaim: Claim = {
   status: 'DRAFT',
   reviewCycle: 0,
   expenseCount: 14,
+  finance: null,
   approvals: [],
   workflowHistory: [],
   reviewRoute: [],

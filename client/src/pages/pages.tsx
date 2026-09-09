@@ -1,44 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Card, EmptyState, PageHeader } from '../components/ui';
-function WorkspacePage({
-  title,
-  description,
-  emptyTitle,
-  emptyMessage,
-}: {
-  title: string;
-  description: string;
-  emptyTitle: string;
-  emptyMessage: string;
-}) {
-  return (
-    <>
-      <PageHeader title={title} description={description} />
-      <Card>
-        <EmptyState title={emptyTitle}>{emptyMessage}</EmptyState>
-      </Card>
-    </>
-  );
-}
+import { ReviewWorkspace } from './ReviewWorkspace';
 export function ApprovalsPage() {
-  return (
-    <WorkspacePage
-      title="Approvals"
-      description="Your assigned business reviews."
-      emptyTitle="Approval workspace"
-      emptyMessage="Assigned reviews will appear here."
-    />
-  );
+  return <ReviewWorkspace />;
 }
 export function FinancePage() {
-  return (
-    <WorkspacePage
-      title="Finance"
-      description="Verification and payment workspace."
-      emptyTitle="Finance workspace"
-      emptyMessage="Settlement verification and payment information will appear here."
-    />
-  );
+  return <ReviewWorkspace finance />;
 }
 export function NotFoundPage() {
   return (

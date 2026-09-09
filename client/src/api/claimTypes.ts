@@ -41,6 +41,15 @@ export interface Claim {
   status: ClaimStatus;
   reviewCycle: number;
   expenseCount: number;
+  finance: null | {
+    verifiedBy: string | null;
+    verifiedAt: string | null;
+    reviewCycle: number;
+    paymentScheduledFor: string | null;
+    paymentScheduledBy: string | null;
+    paidAt: string | null;
+    paymentReference: string | null;
+  };
   approvals: {
     level: string;
     approver: string;
