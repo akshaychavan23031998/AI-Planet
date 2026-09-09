@@ -90,24 +90,93 @@ export function createApp(
   });
 
   /**
-   * API documentation is intentionally independent of MongoDB.
+   * OpenAPI JSON is intentionally independent of MongoDB.
    */
   app.get('/openapi.json', (_req, res) => {
     res.json(openapiDocument);
   });
 
-  app.use(
-    '/docs',
-    swaggerUi.serve,
-    swaggerUi.setup(undefined, {
-      customSiteTitle: 'AI Planet Expense Reimbursement API',
-      swaggerOptions: {
-        url: '/openapi.json',
-        persistAuthorization: true,
-        validatorUrl: null,
-      },
-    }),
-  );
+  /**
+   * swagger-ui-express works normally during local development and tests.
+   *
+   * On Vercel production deployments, its static JavaScript assets may not be
+   * included in the serverless bundle. When that happens the browser receives
+   * HTML for requests such as /docs/swagger-ui-bundle.js and fails with:
+   *
+   *   Unexpected token '<'
+   *
+   * Production therefore serves a small Swagger UI shell backed by pinned CDN
+   * assets while continuing to use this application's authoritative
+   * /openapi.json document.
+   */
+  if (config.NODE_ENV === 'production') {
+    const swaggerUiVersion = '5.32.15';
+
+    const swaggerHtml = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>AI Planet Expense Reimbursement API</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swagger-ui-dist@${swaggerUiVersion}/swagger-ui.css"
+    />
+  </head>
+
+  <body>
+    <div id="swagger-ui"></div>
+
+    <script
+      src="https://unpkg.com/swagger-ui-dist@${swaggerUiVersion}/swagger-ui-bundle.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://unpkg.com/swagger-ui-dist@${swaggerUiVersion}/swagger-ui-standalone-preset.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      window.onload = function () {
+        window.ui = SwaggerUIBundle({
+          url: '/openapi.json',
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          persistAuthorization: true,
+          validatorUrl: null,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          layout: 'StandaloneLayout'
+        });
+      };
+    </script>
+  </body>
+</html>`;
+
+    app.get(['/docs', '/docs/'], (_req, res) => {
+      res.type('html').send(swaggerHtml);
+    });
+  } else {
+    app.use(
+      '/docs',
+      swaggerUi.serve,
+      swaggerUi.setup(undefined, {
+        customSiteTitle: 'AI Planet Expense Reimbursement API',
+        swaggerOptions: {
+          url: '/openapi.json',
+          persistAuthorization: true,
+          validatorUrl: null,
+        },
+      }),
+    );
+  }
 
   /**
    * On production Vercel instances, establish/reuse MongoDB before entering
